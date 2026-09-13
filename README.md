@@ -94,6 +94,8 @@ python3 scripts/inventory.py workspace/baseline > workspace/inventory.json
 
 Use per-source `include` and `exclude` glob patterns when files in the same canonical directory have different runtime roles.
 
+In a manifest-declared `runtime-skills` source, Markdown files with `name` and `description` Frontmatter are recognized as Skills even when their human-facing canonical filenames are flattened, such as `process.md`.
+
 For a single-directory subject, use the simpler importer:
 
 ```bash

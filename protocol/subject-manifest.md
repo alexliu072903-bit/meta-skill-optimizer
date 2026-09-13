@@ -35,3 +35,5 @@ workspace/baseline/
 The lock records the resolved source path, source type, selectors, copied file count, and SHA-256 digest of every copied regular file. It remains inside the ignored workspace and must not be committed.
 
 The manifest defines evaluation inputs; it does not establish instruction priority. Record precedence as a capability relationship only when the runtime or an authoritative instruction source actually defines it.
+
+Within a `runtime-skills` source, inventory recognizes Markdown files with valid `name` and `description` Frontmatter even when the human-facing filename is not `SKILL.md`. This allows a readable flat canonical directory while preserving standard installed Skill directories separately.

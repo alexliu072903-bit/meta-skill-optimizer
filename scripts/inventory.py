@@ -56,8 +56,18 @@ def main() -> None:
             return parts[1], source_index[parts[1]]
         return "subject", "runtime-skills"
 
+    skill_paths = set(subject.rglob("SKILL*.md"))
+    if source_index:
+        for path in subject.rglob("*.md"):
+            _source_id, source_kind = source_for(path)
+            if source_kind != "runtime-skills":
+                continue
+            metadata = frontmatter(path.read_text(encoding="utf-8", errors="replace"))
+            if metadata.get("name") and metadata.get("description"):
+                skill_paths.add(path)
+
     skills = []
-    for path in sorted(subject.rglob("SKILL*.md")):
+    for path in sorted(skill_paths):
         text = path.read_text(encoding="utf-8", errors="replace")
         metadata = frontmatter(text)
         source_id, source_kind = source_for(path)

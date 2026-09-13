@@ -94,6 +94,8 @@ python3 scripts/inventory.py workspace/baseline > workspace/inventory.json
 
 如果同一个 canonical 目录中的文件承担不同运行角色，可以为每个来源配置 `include` 和 `exclude` glob。
 
+在 Manifest 声明的 `runtime-skills` 来源中，只要 Markdown 包含有效的 `name` 和 `description` Frontmatter，即使使用 `process.md` 这样的扁平化人类可读文件名，也会被正确识别为 Skill。
+
 如果测试对象只有一个目录，可以使用简化导入方式：
 
 ```bash
