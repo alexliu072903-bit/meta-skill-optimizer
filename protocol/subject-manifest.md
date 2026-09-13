@@ -36,4 +36,4 @@ The lock records the resolved source path, source type, selectors, copied file c
 
 The manifest defines evaluation inputs; it does not establish instruction priority. Record precedence as a capability relationship only when the runtime or an authoritative instruction source actually defines it.
 
-Within a `runtime-skills` source, inventory recognizes Markdown files with valid `name` and `description` Frontmatter even when the human-facing filename is not `SKILL.md`. This allows a readable flat canonical directory while preserving standard installed Skill directories separately.
+Within a `runtime-skills` source, inventory recognizes only Markdown files with valid `name` and `description` Frontmatter, even when the human-facing filename is not `SKILL.md`. A Skill-like filename without valid Frontmatter remains an instruction document. This allows a readable flat canonical directory without turning human notes into active Skills.
