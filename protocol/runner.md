@@ -1,6 +1,8 @@
 # Runner Contract
 
-Meta-Skill Optimizer does not assume one model provider. A Runner executes prepared tasks and returns auditable result bundles.
+Meta-Skill Optimizer uses one shared contract for two supported execution targets: Codex and Claude Code. A Runner executes prepared tasks and returns auditable result bundles.
+
+Do not add generic adapters for other Agent Runtimes. A Codex or Claude Code adapter must reproduce the subject's native instruction discovery and activation behavior; injecting every instruction into one prompt is not an equivalent evaluation because it bypasses eligibility and routing.
 
 ## Input
 

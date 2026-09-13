@@ -55,6 +55,8 @@ Silence outside the intended scene is healthy. A capability does not need to be 
 
 Do not stop at a static recommendation when the task asks whether a Candidate is better. Preserve raw outputs and behavior evidence, register a Comparison inside the Review Session, and record one outcome: `accepted`, `rejected`, or `inconclusive`. Do not silently accept a regression or inconclusive comparison. A recorded decision never applies the Candidate to the source automatically.
 
+Treat Feedback as a durable review record, not an automatic Learning Loop. Leave the next Case or Candidate decision to the person using the repository and their Agent. Execution adapters are limited to Codex and Claude Code and must preserve native instruction discovery; do not simulate Runtime behavior by force-loading every instruction into a prompt.
+
 ## Output
 
 Return only findings that can change the system. For each proposal include:

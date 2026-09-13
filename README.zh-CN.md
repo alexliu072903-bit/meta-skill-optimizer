@@ -43,7 +43,7 @@ Meta-Skill Optimizer 解决的是普通 Prompt Review 很难回答的问题：
 → 两个版本执行相同 Cases
 → 基于证据进行比较
 → Accept / Reject / Inconclusive
-→ 为下一轮保留反馈
+→ 为用户的下一次判断保留反馈
 ```
 
 深入分析之前，先用两个问题快速判断每个组件：
@@ -174,7 +174,9 @@ meta-skill-optimizer/
 
 ## 当前限制
 
-仓库已经定义与模型供应商无关的 Runner Contract，但暂未提供能够覆盖所有模型和 Agent Runtime 的通用执行 Adapter。真实模型执行和基于证据的行为判断仍需要合适的 Runner。Whole-System Map 和 Component Review 目前是由协议引导生成的 Artifact，不是自动结论；系统会保存 Feedback，但暂时不会自动生成下一轮实验。
+仓库使用一份共享 Runner Contract，并且只计划支持两个执行 Adapter：Codex 和 Claude Code。两个原生 Runtime Adapter 目前尚未实现；仓库不会追求对其他 Agent 的通用支持。Whole-System Map 和 Component Review 目前是由协议引导生成的 Artifact，不是自动结论。
+
+Feedback 被明确设计为记录，而不是自动 Learning Loop。实际使用者与自己的 Agent 决定一次结果应该成为新 Case、修改后的 Candidate，还是不再继续处理。
 
 ## License
 

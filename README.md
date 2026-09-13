@@ -43,7 +43,7 @@ Complete instruction system
 → Same Cases run against both versions
 → Evidence-backed comparison
 → Accept / Reject / Inconclusive
-→ Feedback is preserved for the next iteration
+→ Feedback is preserved for the user's next decision
 ```
 
 The review asks two simple questions before deeper analysis:
@@ -174,7 +174,9 @@ Read [`protocol/safety.md`](protocol/safety.md) before evaluating private or hig
 
 ## Current limitation
 
-The repository defines a provider-neutral Runner Contract, but does not yet ship a universal adapter for every model or Agent runtime. Model execution and evidence-based behavioral judgment still need an appropriate Runner. Whole-system maps and component reviews are guided artifacts rather than automatically generated conclusions. Recorded feedback is preserved but does not yet create the next experiment automatically.
+The repository defines one shared Runner Contract and will support two execution adapters: Codex and Claude Code. Those native Runtime adapters are not implemented yet; the repository will not pursue universal support for other Agents. Whole-system maps and component reviews are guided artifacts rather than automatically generated conclusions.
+
+Feedback is deliberately a record, not an automatic Learning Loop. The person using the repository decides with their Agent whether a result should become a new Case, a revised Candidate, or no further action.
 
 ## License
 
