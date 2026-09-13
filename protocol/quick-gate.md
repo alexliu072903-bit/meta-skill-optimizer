@@ -6,6 +6,8 @@ Use this gate before a detailed component review.
 
 State one concrete outcome the component provides to the user. Do not answer with its mechanism, file format, internal stage, or a generic phrase such as "improves efficiency."
 
+Treat verified repeated use and user-supplied provenance as value evidence. Do not infer ownership, authority, or usage from how complete or polished the component appears.
+
 If no concrete user value can be identified:
 
 - verdict: `archive`;
@@ -48,4 +50,3 @@ Standalone reason:
 Quick verdict: independent / merge-or-demote / archive / needs-evidence
 Next action:
 ```
-

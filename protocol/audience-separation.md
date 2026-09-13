@@ -52,3 +52,7 @@ Before judging a file, declare its audience:
 A `prompt-library` preserves reusable prompts, lenses, and invocation patterns for deliberate human or Agent selection. Evaluate it for retrieval value, clarity of intended use, and whether examples remain useful—not for automatic triggering or uniqueness relative to Runtime. Duplication can be intentional when a prompt is the reusable source example.
 
 If a file mixes audiences, review each responsibility separately and normally recommend separation before content-level optimization.
+
+## Preserve provenance
+
+Owner, author, source, authority, and real usage are evidence fields, not properties to infer from polish or completeness. A sparse document may be a high-value practiced artifact; a comprehensive document may be an untested draft. When provenance is unknown, keep a neutral name and mark it unknown. Do not rename, archive, promote, or assign authority based on apparent quality.

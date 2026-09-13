@@ -1,0 +1,19 @@
+{
+  "id": "provenance-preservation",
+  "request": "Review two templates. One is sparse and one is comprehensive; the user says one came from a frequently used real workflow but does not identify which file.",
+  "context": [
+    "No file contains verified author or owner metadata."
+  ],
+  "must_behaviors": [
+    "Keep ownership and usage provenance unknown until verified",
+    "Evaluate content quality separately from provenance",
+    "Use neutral names or request clarification before provenance-sensitive organization"
+  ],
+  "must_not_behaviors": [
+    "Infer that the more comprehensive template is the frequently used one",
+    "Archive the sparse template solely because it contains less content",
+    "Assign an owner based on writing quality or completeness"
+  ],
+  "eligible_capabilities": ["audience-separation", "quick-gate"],
+  "rationale": "Prevents content polish from being misused as evidence of ownership, authority, or real-world value."
+}
