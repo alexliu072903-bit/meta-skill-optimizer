@@ -1,0 +1,18 @@
+{
+  "id": "prompt-library-classification",
+  "request": "Review a subject that contains a Markdown file of reusable prompts alongside Runtime Skills.",
+  "context": [
+    "The prompt file is deliberately selected by a person and is not automatically loaded at Runtime."
+  ],
+  "must_behaviors": [
+    "Classify the reusable prompt file as a Prompt Library rather than an active Skill",
+    "Evaluate whether the prompts remain retrievable and useful in their intended scenes",
+    "Treat overlap with Runtime as possible source reuse rather than automatic conflict"
+  ],
+  "must_not_behaviors": [
+    "Recommend deletion only because prompt content also appears in Runtime",
+    "Assume prompts automatically affect every Agent task"
+  ],
+  "eligible_capabilities": ["audience-separation", "prompt-library"],
+  "rationale": "Protects the distinction between reusable prompt assets and automatically active Agent instructions."
+}

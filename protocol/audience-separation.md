@@ -45,8 +45,10 @@ Before judging a file, declare its audience:
 
 - `human-methodology`;
 - `agent-runtime`;
+- `prompt-library`;
 - `state-or-data`;
 - `maintenance`.
 
-If a file mixes audiences, review each responsibility separately and normally recommend separation before content-level optimization.
+A `prompt-library` preserves reusable prompts, lenses, and invocation patterns for deliberate human or Agent selection. Evaluate it for retrieval value, clarity of intended use, and whether examples remain useful—not for automatic triggering or uniqueness relative to Runtime. Duplication can be intentional when a prompt is the reusable source example.
 
+If a file mixes audiences, review each responsibility separately and normally recommend separation before content-level optimization.

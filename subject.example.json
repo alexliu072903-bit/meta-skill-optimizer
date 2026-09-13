@@ -32,6 +32,13 @@
       "description": "Complete philosophy, methods, rationale, and examples for human readers"
     },
     {
+      "id": "prompt-library",
+      "kind": "prompt-library",
+      "path": "/path/to/prompts",
+      "required": false,
+      "description": "Reusable prompts and Cognitive Lens invocations"
+    },
+    {
       "id": "context-provider",
       "kind": "context-provider",
       "path": "/path/to/context-skill",

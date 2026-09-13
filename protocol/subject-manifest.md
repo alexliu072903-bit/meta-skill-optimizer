@@ -9,6 +9,7 @@ Use `schemas/subject.schema.json` and `subject.example.json` to declare the subj
 - `project-instructions`: repository or task-scoped Agent instructions;
 - `context-provider`: a capability that retrieves or writes context;
 - `human-methodology`: philosophy, rationale, examples, and complete methods intended primarily for people;
+- `prompt-library`: reusable prompts and invocation patterns that are not automatically active Runtime instructions;
 - `other`: a relevant instruction source that does not fit the above types.
 
 ## Inclusion rule

@@ -21,6 +21,8 @@ The source Skill system is never edited. The optimizer does not automatically ap
 
 The optimizer distinguishes complete human-facing methodology from concise Agent Runtime instructions. Human material is evaluated for coherence and explanatory value; Runtime material is evaluated for observable behavioral contribution. One should inform the other, but they should not be forced into the same file.
 
+Reusable prompt libraries are classified separately. A prompt is not assumed to be an automatically active Skill, and overlap with Runtime instructions is not by itself a reason to remove it.
+
 ## Repository learning loop
 
 The optimizer is improved through the same evidence discipline it applies to subjects:
