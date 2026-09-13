@@ -1,0 +1,5 @@
+interface:
+  display_name: "Meta-Skill Optimizer"
+  short_description: "Evaluate and improve a complete Skill system"
+  default_prompt: "Use $meta-skill-optimizer to evaluate this Skill system and propose evidence-backed improvements."
+

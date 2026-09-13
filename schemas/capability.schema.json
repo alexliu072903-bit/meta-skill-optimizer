@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Capability",
+  "type": "object",
+  "required": ["id", "source", "purpose", "role", "eligible_scenes", "activation", "observable_contribution"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "source": {"type": "string", "minLength": 1},
+    "purpose": {"type": "string", "minLength": 1},
+    "role": {"enum": ["workflow", "judgment", "context", "execution", "preference"]},
+    "eligible_scenes": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "activation": {"enum": ["explicit", "automatic", "dependency", "always-on"]},
+    "inputs": {"type": "array", "items": {"type": "string"}, "default": []},
+    "outputs": {"type": "array", "items": {"type": "string"}, "default": []},
+    "dependencies": {"type": "array", "items": {"type": "string"}, "default": []},
+    "exclusions": {"type": "array", "items": {"type": "string"}, "default": []},
+    "observable_contribution": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}
+

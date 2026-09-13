@@ -1,0 +1,18 @@
+{
+  "id": "example-convergence",
+  "request": "Review this hypothetical product direction and identify the one decision that most changes its scope.",
+  "context": [
+    "This is synthetic fixture data and is not derived from a private Skill system."
+  ],
+  "must_behaviors": [
+    "Identify one decision object before discussing secondary details",
+    "Separate confirmed information from assumptions"
+  ],
+  "must_not_behaviors": [
+    "Invent user evidence",
+    "Expand the request into implementation work"
+  ],
+  "eligible_capabilities": [],
+  "rationale": "Exercises system-level convergence without encoding desired wording."
+}
+

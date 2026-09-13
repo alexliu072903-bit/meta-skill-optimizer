@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Behavioral Case",
+  "type": "object",
+  "required": ["id", "request", "must_behaviors", "must_not_behaviors", "rationale"],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "request": {"type": "string", "minLength": 1},
+    "context": {"type": "array", "items": {"type": "string"}, "default": []},
+    "must_behaviors": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "must_not_behaviors": {"type": "array", "items": {"type": "string"}},
+    "eligible_capabilities": {"type": "array", "items": {"type": "string"}, "default": []},
+    "rationale": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}
+
