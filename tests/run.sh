@@ -66,9 +66,22 @@ candidate = {
         "unnecessary_steps": 1, "observable_contributions": ["synthetic"]
     }]
 }
+(root / "component-review.json").write_text(json.dumps({
+    "id": "alpha",
+    "source": "alpha/SKILL.md",
+    "claimed_purpose": "Improve a synthetic task behavior",
+    "representative_scenes": ["synthetic case"],
+    "expected_behavior_delta": "Produce the required synthetic behavior",
+    "costs": ["additional instruction context"],
+    "evidence": [],
+    "verdict": "unproven",
+    "reason": "No behavioral comparison has run yet",
+    "interaction_review_ready": False
+}))
 (root / "baseline.json").write_text(json.dumps(baseline))
 (root / "candidate.json").write_text(json.dumps(candidate))
 PY
+python3 "$ROOT/scripts/validate_data.py" "$TMP_DIR/component-review.json" "$ROOT/schemas/component-review.schema.json"
 python3 "$ROOT/scripts/validate_data.py" "$TMP_DIR/baseline.json" "$ROOT/schemas/result.schema.json"
 python3 "$ROOT/scripts/validate_data.py" "$TMP_DIR/candidate.json" "$ROOT/schemas/result.schema.json"
 python3 "$ROOT/scripts/compare_results.py" "$TMP_DIR/baseline.json" "$TMP_DIR/candidate.json" > "$TMP_DIR/comparison.json"

@@ -10,11 +10,11 @@ The problem is not whether each Skill reads well in isolation. The problem is wh
 
 v0 supports an evidence-first, human-approved workflow:
 
-1. copy a Skill system into an ignored local workspace;
-2. inventory its declared capabilities, roles, and dependencies;
-3. define behavioral cases that represent real work;
-4. compare an immutable baseline with isolated candidates;
-5. recommend a bounded change based on behavioral evidence;
+1. copy the complete instruction system into an ignored local workspace;
+2. map every file's role in the whole system;
+3. establish whether every component provides net value in its intended scenes;
+4. inspect conflicts and interactions only among useful components;
+5. compare an immutable baseline with isolated optimization candidates;
 6. produce a reviewable patch.
 
 The source Skill system is never edited. The optimizer does not automatically apply patches, publish private data, or claim that static text inspection proves behavioral improvement.
@@ -31,6 +31,16 @@ Capability exists
 ```
 
 A capability does not need to appear frequently. It needs to produce a stable, distinct, verifiable behavioral improvement in the scenes where it matters. The performance of the whole system takes priority over preserving every Skill.
+
+The review order is deliberate:
+
+```text
+Whole-system map
+→ Component utility
+→ Interactions among useful components
+→ Portfolio optimization
+→ Regression evaluation
+```
 
 ## Repository structure
 

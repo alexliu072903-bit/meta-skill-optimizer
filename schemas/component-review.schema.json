@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Component Utility Review",
+  "type": "object",
+  "required": [
+    "id",
+    "source",
+    "claimed_purpose",
+    "representative_scenes",
+    "expected_behavior_delta",
+    "costs",
+    "evidence",
+    "verdict",
+    "reason"
+  ],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "source": {"type": "string", "minLength": 1},
+    "claimed_purpose": {"type": "string", "minLength": 1},
+    "representative_scenes": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "expected_behavior_delta": {"type": "string", "minLength": 1},
+    "costs": {"type": "array", "items": {"type": "string"}},
+    "evidence": {"type": "array", "items": {"type": "string"}},
+    "verdict": {"enum": ["keep", "revise", "merge", "delete", "unproven"]},
+    "reason": {"type": "string", "minLength": 1},
+    "interaction_review_ready": {"type": "boolean"}
+  },
+  "additionalProperties": false
+}
+

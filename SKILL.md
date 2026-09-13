@@ -17,11 +17,14 @@ Optimize the behavior of the complete Skill system, not the apparent quality or 
 
 ## Choose the needed operation
 
+- For a complete portfolio review, read [protocol/system-review.md](protocol/system-review.md) and follow its stage gates in order.
 - For inventory, reachability, role, overlap, or dependency analysis, read [protocol/capability-model.md](protocol/capability-model.md).
 - For behavioral cases, baseline/candidate runs, ablation, and comparison, read [protocol/evaluation.md](protocol/evaluation.md).
 - For deciding whether to add, strengthen, reroute, merge, split, demote, or delete, read [protocol/optimization.md](protocol/optimization.md).
 
 Do not load every protocol for a narrow request.
+
+Do not begin interaction optimization merely because files overlap. First establish whether each component provides net value in its intended scene. A component that is not useful does not deserve integration work.
 
 ## Evidence boundary
 

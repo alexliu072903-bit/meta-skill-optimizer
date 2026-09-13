@@ -1,6 +1,18 @@
 # Evaluation Protocol
 
-Evaluation asks whether a Skill-system change improves representative work. It is not another conversational phase and it does not score writing style in isolation.
+Evaluation asks first whether each component improves representative work, then whether the useful components improve or weaken one another. It is not another conversational phase and it does not score writing style in isolation.
+
+## Evaluation order
+
+For a complete system review:
+
+1. map all included files and their claimed roles;
+2. compare each component against no component or the simplest reasonable instruction in its intended scenes;
+3. assign a provisional component verdict using `schemas/component-review.schema.json`;
+4. analyze interactions only among components whose useful behavior is supported;
+5. evaluate bounded portfolio changes against the complete baseline.
+
+"Component utility" does not mean removing all context and testing a file in a vacuum. Supply the minimum context and dependencies required by its intended job, while withholding unrelated Meta Skills.
 
 ## Case contract
 
@@ -19,6 +31,8 @@ Do not encode the desired wording of the answer. Judge behavior and outcome.
 Use only the variants needed to answer the current question:
 
 - `baseline`: the unchanged complete Skill system;
+- `no-component`: the representative task without the component under review;
+- `component`: the same task with that component and only its required context;
 - `ablation`: baseline with one capability removed or disabled;
 - `candidate`: baseline with one bounded change;
 - `isolated`: one capability used alone, only when diagnosing dilution or shadowing.
@@ -40,11 +54,10 @@ Use `schemas/result.schema.json` for stored results.
 
 ## Comparison
 
-A candidate is better only when it improves at least one material behavior without introducing a more important regression. Prefer the simpler system when behavioral results are equivalent.
+A component is useful only when it improves a material behavior enough to justify its costs. A candidate system is better only when it improves at least one material behavior without introducing a more important regression. Prefer the simpler component or system when behavioral results are equivalent.
 
 Do not average away a critical failure. Report per-case regressions before aggregate scores.
 
 ## Attribution limits
 
 Observed correlation does not prove internal reasoning. Say that a capability changed the output only when the controlled comparison supports it. Otherwise describe the result as consistent with an influence or as inconclusive.
-

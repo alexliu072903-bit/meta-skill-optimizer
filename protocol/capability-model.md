@@ -4,6 +4,8 @@ Use this model to describe what a Skill contributes to the system. Do not confus
 
 Before modeling capabilities, read [subject-manifest.md](subject-manifest.md) when the runtime combines Skills with preferences, project instructions, or context providers.
 
+For a complete review, build the whole-system map in [system-review.md](system-review.md) before evaluating individual capability relationships.
+
 ## Required fields
 
 Each capability record contains:

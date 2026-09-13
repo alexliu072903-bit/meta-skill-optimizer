@@ -2,6 +2,12 @@
 
 Optimize total system capability relative to complexity, not the number of Skills or the visibility of each Skill.
 
+## Entry gate
+
+Do not optimize interactions before reviewing the whole system and establishing provisional utility for every included file. First decide whether a component should exist; only then decide how useful components should work together.
+
+Structural defects such as missing dependencies may be recorded immediately, but they do not justify preserving or repairing the affected component until its utility is supported.
+
 ## Allowed actions
 
 - `add`: repeated cases expose a missing capability;
@@ -24,6 +30,8 @@ Every optimization proposal must state:
 6. regression risk and rollback point;
 7. the comparison that would accept or reject it.
 
+Also name the component verdicts that make the proposal eligible. An `unproven` component requires a utility test, not integration work.
+
 Do not add a new Skill when rerouting, strengthening, or deleting an existing instruction solves the demonstrated problem.
 
 ## Decision rule
@@ -36,4 +44,3 @@ Keep a candidate when:
 - added system complexity is justified by distinct contribution.
 
 When results are equivalent, choose the candidate with fewer responsibilities, weaker coupling, and less mandatory procedure.
-
