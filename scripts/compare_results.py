@@ -48,21 +48,18 @@ def score(case):
     }
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Compare auditable behavioral result bundles case by case.")
-    parser.add_argument("baseline", type=Path)
-    parser.add_argument("candidate", type=Path)
-    args = parser.parse_args()
-    baseline = load_json(args.baseline)
-    candidate = load_json(args.candidate)
+def compare(baseline, candidate):
     validate_bundle(baseline, "baseline")
     validate_bundle(candidate, "candidate")
-    if baseline.get("version") != 1 or candidate.get("version") != 1:
-        raise SystemExit("Both result bundles must use version 1.")
+    if baseline.get("version") != 2 or candidate.get("version") != 2:
+        raise SystemExit("Both result bundles must use version 2.")
     if baseline["session_id"] != candidate["session_id"]:
         raise SystemExit("Result bundles belong to different review sessions.")
     if baseline["case_set_digest"] != candidate["case_set_digest"]:
         raise SystemExit("Case-set digests differ; comparison would be invalid.")
+    for field in ("runtime", "model", "configuration_digest"):
+        if baseline[field] != candidate[field]:
+            raise SystemExit(f"{field.replace('_', ' ').title()} differs; comparison would be invalid.")
 
     old = index_unique(baseline["cases"], "baseline case")
     new = index_unique(candidate["cases"], "candidate case")
@@ -82,6 +79,16 @@ def main() -> None:
         improvements = []
         if after["critical_failure"] and not before["critical_failure"]:
             regressions.append("introduced critical failure")
+        elif before["critical_failure"] and not after["critical_failure"]:
+            improvements.append("resolved critical failure")
+        if before["completed"] and not after["completed"]:
+            regressions.append("task no longer completed")
+        elif not before["completed"] and after["completed"]:
+            improvements.append("task now completed")
+        if after["inconclusive"] > before["inconclusive"]:
+            regressions.append("more inconclusive behavior checks")
+        elif after["inconclusive"] < before["inconclusive"]:
+            improvements.append("fewer inconclusive behavior checks")
         if after["required_rate"] < before["required_rate"]:
             regressions.append("lower required-behavior rate")
         elif after["required_rate"] > before["required_rate"]:
@@ -102,15 +109,31 @@ def main() -> None:
             "regressions": regressions,
             "verdict": "regressed" if regressions else ("improved" if improvements else "equivalent")
         })
-    write_json({
-        "version": 1,
+    has_regression = any(item["regressions"] for item in comparisons)
+    has_inconclusive = any(item["candidate"]["inconclusive"] for item in comparisons)
+    has_improvement = any(item["improvements"] for item in comparisons)
+    recommendation = "rejected" if has_regression else (
+        "inconclusive" if has_inconclusive or not has_improvement else "accepted"
+    )
+    return {
+        "version": 2,
         "session_id": baseline["session_id"],
         "baseline_variant": baseline["variant"],
         "candidate_variant": candidate["variant"],
         "cases": comparisons,
-        "candidate_has_regression": any(item["regressions"] for item in comparisons),
-        "candidate_has_inconclusive": any(item["candidate"]["inconclusive"] for item in comparisons)
-    })
+        "candidate_has_regression": has_regression,
+        "candidate_has_inconclusive": has_inconclusive,
+        "candidate_has_improvement": has_improvement,
+        "recommendation": recommendation
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Compare auditable behavioral result bundles case by case.")
+    parser.add_argument("baseline", type=Path)
+    parser.add_argument("candidate", type=Path)
+    args = parser.parse_args()
+    write_json(compare(load_json(args.baseline), load_json(args.candidate)))
 
 
 if __name__ == "__main__":

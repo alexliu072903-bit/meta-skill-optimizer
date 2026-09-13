@@ -2,11 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Review Session",
   "type": "object",
-  "required": ["version", "id", "status", "manifest", "case_set", "baseline", "candidates", "runs"],
+  "required": ["version", "id", "status", "manifest", "case_set", "baseline", "candidates", "runs", "comparisons"],
   "properties": {
-    "version": {"const": 1},
+    "version": {"const": 2},
     "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
-    "status": {"enum": ["imported", "candidate-ready", "evaluated", "accepted", "rejected", "inconclusive"]},
+    "status": {"enum": ["imported", "candidate-ready", "evaluated", "compared", "accepted", "rejected", "inconclusive"]},
     "manifest": {
       "type": "object",
       "required": ["path", "digest"],
@@ -56,6 +56,19 @@
         "required": ["variant", "path", "digest"],
         "properties": {
           "variant": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1},
+          "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "comparisons": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["candidate", "path", "digest"],
+        "properties": {
+          "candidate": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
           "path": {"type": "string", "minLength": 1},
           "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
         },

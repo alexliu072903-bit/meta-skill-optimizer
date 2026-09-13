@@ -64,7 +64,8 @@ assert composite["instruction_document_count"] == 4
 assert {item["source_kind"] for item in composite["instruction_documents"]} == {"runtime-skills", "preference", "human-methodology", "prompt-library"}
 
 baseline = {
-    "version": 1, "session_id": "comparison-test", "variant": "baseline",
+    "version": 2, "session_id": "comparison-test", "variant": "baseline",
+    "runtime": "synthetic-runner", "model": "synthetic-model", "configuration_digest": "e" * 64,
     "subject_digest": "a" * 64, "case_set_digest": "b" * 64,
     "cases": [{
         "id": "case-1", "case_digest": "c" * 64, "raw_output": "baseline output",
@@ -76,7 +77,8 @@ baseline = {
     }]
 }
 candidate = {
-    "version": 1, "session_id": "comparison-test", "variant": "candidate",
+    "version": 2, "session_id": "comparison-test", "variant": "candidate",
+    "runtime": "synthetic-runner", "model": "synthetic-model", "configuration_digest": "e" * 64,
     "subject_digest": "d" * 64, "case_set_digest": "b" * 64,
     "cases": [{
         "id": "case-1", "case_digest": "c" * 64, "raw_output": "candidate output",
@@ -126,6 +128,20 @@ result = json.load(open(sys.argv[1]))
 assert result["candidate_has_regression"] is False
 assert result["cases"][0]["verdict"] == "improved"
 PY
+
+# Different execution configurations are not comparable.
+python3 - "$TMP_DIR/candidate.json" "$TMP_DIR/different-config.json" <<'PY'
+import json, sys
+from pathlib import Path
+source, target = map(Path, sys.argv[1:])
+value = json.loads(source.read_text())
+value["configuration_digest"] = "f" * 64
+target.write_text(json.dumps(value))
+PY
+if python3 "$ROOT/scripts/compare_results.py" "$TMP_DIR/baseline.json" "$TMP_DIR/different-config.json" >/dev/null 2>&1; then
+  echo 'Expected different execution configurations to be incomparable' >&2
+  exit 1
+fi
 
 # Binary assets are reported without lossy text decoding.
 mkdir -p "$TMP_DIR/binary-old" "$TMP_DIR/binary-new"
@@ -186,7 +202,8 @@ for variant, tasks in groups.items():
             "observable_contributions": []
         })
     result = {
-        "version": 1, "session_id": plan["session_id"], "variant": variant,
+        "version": 2, "session_id": plan["session_id"], "variant": variant,
+        "runtime": "synthetic-runner", "model": "synthetic-model", "configuration_digest": "e" * 64,
         "subject_digest": tasks[0]["subject_digest"],
         "case_set_digest": plan["case_set_digest"], "cases": cases
     }
@@ -194,7 +211,8 @@ for variant, tasks in groups.items():
 PY
 python3 "$ROOT/scripts/review_session.py" register-run review-test "$TMP_DIR/session-baseline.json"
 python3 "$ROOT/scripts/review_session.py" register-run review-test "$TMP_DIR/session-candidate-one.json"
-python3 "$ROOT/scripts/compare_results.py" "$TMP_DIR/session-baseline.json" "$TMP_DIR/session-candidate-one.json" > "$TMP_DIR/session-comparison.json"
+python3 "$ROOT/scripts/review_session.py" compare review-test --candidate candidate-one > "$TMP_DIR/session-comparison.json"
+python3 "$ROOT/scripts/validate_data.py" "$TMP_DIR/session-comparison.json" "$ROOT/schemas/comparison.schema.json"
 python3 "$ROOT/scripts/review_session.py" decide review-test --candidate candidate-one --verdict accepted --reason 'Synthetic candidate improved the required behavior.'
 python3 "$ROOT/scripts/validate_data.py" "$MSO_WORKSPACE/sessions/review-test/session.json" "$ROOT/schemas/session.schema.json"
 python3 "$ROOT/scripts/validate_data.py" "$MSO_WORKSPACE/sessions/review-test/feedback/decision.json" "$ROOT/schemas/feedback.schema.json"
@@ -228,5 +246,57 @@ if python3 "$ROOT/scripts/review_session.py" plan sealed-test >/dev/null 2>&1; t
   echo 'Expected a mutated sealed candidate to stop planning' >&2
   exit 1
 fi
+
+# Decisions cannot bypass comparisons, and accepting a regression requires an explicit override.
+python3 "$ROOT/scripts/review_session.py" init regression-test --manifest "$TMP_DIR/subject.json" --cases "$TMP_DIR/session-cases"
+python3 "$ROOT/scripts/review_session.py" candidate regression-test worse-one
+python3 "$ROOT/scripts/review_session.py" seal-candidate regression-test worse-one
+python3 "$ROOT/scripts/review_session.py" plan regression-test > "$TMP_DIR/regression-plan.json"
+python3 - "$TMP_DIR/regression-plan.json" "$TMP_DIR" <<'PY'
+import json, sys
+from collections import defaultdict
+from pathlib import Path
+plan, temp = json.loads(Path(sys.argv[1]).read_text()), Path(sys.argv[2])
+groups = defaultdict(list)
+for task in plan["tasks"]:
+    groups[task["variant"]].append(task)
+for variant, tasks in groups.items():
+    outcome = "pass" if variant == "baseline" else "fail"
+    cases = [{
+        "id": task["case_id"], "case_digest": task["case_digest"],
+        "raw_output": f"{variant} output", "completed": outcome == "pass",
+        "behavior_checks": [
+            {"behavior": "Complete the task", "kind": "must", "outcome": outcome, "evidence": "synthetic evidence"},
+            {"behavior": "Add an unnecessary step", "kind": "must_not", "outcome": "pass", "evidence": "not observed"}
+        ]
+    } for task in tasks]
+    value = {
+        "version": 2, "session_id": plan["session_id"], "variant": variant,
+        "subject_digest": tasks[0]["subject_digest"], "case_set_digest": plan["case_set_digest"],
+        "runtime": "synthetic-runner", "model": "synthetic-model", "configuration_digest": "e" * 64, "cases": cases
+    }
+    (temp / f"regression-{variant}.json").write_text(json.dumps(value))
+PY
+python3 "$ROOT/scripts/review_session.py" register-run regression-test "$TMP_DIR/regression-baseline.json"
+python3 "$ROOT/scripts/review_session.py" register-run regression-test "$TMP_DIR/regression-worse-one.json"
+if python3 "$ROOT/scripts/review_session.py" decide regression-test --candidate worse-one --verdict accepted --reason 'No comparison.' >/dev/null 2>&1; then
+  echo 'Expected a decision without a registered comparison to fail' >&2
+  exit 1
+fi
+python3 "$ROOT/scripts/review_session.py" compare regression-test --candidate worse-one >/dev/null
+if python3 "$ROOT/scripts/review_session.py" decide regression-test --candidate worse-one --verdict accepted --reason 'Silent regression.' >/dev/null 2>&1; then
+  echo 'Expected acceptance of a regression without override to fail' >&2
+  exit 1
+fi
+python3 "$ROOT/scripts/review_session.py" decide regression-test --candidate worse-one --verdict accepted --override-comparison --reason 'Deliberate trade-off.'
+
+# Registered Result artifacts remain immutable through comparison and decision.
+cp "$MSO_WORKSPACE/sessions/review-test/runs/candidate-one.json" "$TMP_DIR/registered-run-backup.json"
+printf ' ' >> "$MSO_WORKSPACE/sessions/review-test/runs/candidate-one.json"
+if python3 "$ROOT/scripts/review_session.py" compare review-test --candidate candidate-one >/dev/null 2>&1; then
+  echo 'Expected a changed registered Result to stop the session' >&2
+  exit 1
+fi
+mv "$TMP_DIR/registered-run-backup.json" "$MSO_WORKSPACE/sessions/review-test/runs/candidate-one.json"
 
 echo "All tests passed."

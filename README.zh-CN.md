@@ -8,7 +8,7 @@ Meta-Skill Optimizer 解决的是普通 Prompt Review 很难回答的问题：
 
 > 当单独看都很优秀的 Skills、Preference、Prompts 和 Context Rules 一起工作时，它们究竟让 Agent 变得更强了，还是开始互相掣肘？
 
-它会把完整指令系统导入隔离环境，梳理每个组件在整体中的作用，对比修改前后的真实行为，并记录这次改动应该接受、拒绝，还是因为证据不足而继续验证。
+它会把完整指令系统导入隔离环境，引导完成整体系统审查，并把行为证据、比较结果和最终决策连接在同一个 Review Session 中。
 
 ## 为什么需要它
 
@@ -43,7 +43,7 @@ Meta-Skill Optimizer 解决的是普通 Prompt Review 很难回答的问题：
 → 两个版本执行相同 Cases
 → 基于证据进行比较
 → Accept / Reject / Inconclusive
-→ 反馈进入下一轮优化
+→ 为下一轮保留反馈
 ```
 
 深入分析之前，先用两个问题快速判断每个组件：
@@ -105,7 +105,7 @@ python3 scripts/review_session.py plan my-review > workspace/run-plan.json
 ```bash
 python3 scripts/review_session.py register-run my-review baseline-result.json
 python3 scripts/review_session.py register-run my-review candidate-result.json
-python3 scripts/compare_results.py baseline-result.json candidate-result.json
+python3 scripts/review_session.py compare my-review --candidate simpler-routing
 ```
 
 ### 4. 记录决策
@@ -117,7 +117,9 @@ python3 scripts/review_session.py decide my-review \
   --reason "核心行为得到改善，并且没有重要回归。"
 ```
 
-`accepted` 只代表结论已被记录，不代表可以自动修改正式来源。需要应用修改时，先生成 Patch 供人审查：
+Decision 必须引用已经注册的 Comparison。当 Comparison 存在回归或证据不充分时，系统默认阻止接受；如果 Reviewer 仍要接受，必须使用显式且会被记录的 override。`accepted` 不代表可以自动修改正式来源。
+
+需要应用修改时，先生成 Patch 供人审查：
 
 ```bash
 python3 scripts/generate_patch.py \
@@ -172,7 +174,7 @@ meta-skill-optimizer/
 
 ## 当前限制
 
-仓库已经定义与模型供应商无关的 Runner Contract，但暂未提供能够覆盖所有模型和 Agent Runtime 的通用执行 Adapter。真实模型执行和基于证据的行为判断仍需要合适的 Runner；其余环节——导入、隔离、计划、校验、比较、决策记录和 Patch 生成——已经由仓库支持。
+仓库已经定义与模型供应商无关的 Runner Contract，但暂未提供能够覆盖所有模型和 Agent Runtime 的通用执行 Adapter。真实模型执行和基于证据的行为判断仍需要合适的 Runner。Whole-System Map 和 Component Review 目前是由协议引导生成的 Artifact，不是自动结论；系统会保存 Feedback，但暂时不会自动生成下一轮实验。
 
 ## License
 

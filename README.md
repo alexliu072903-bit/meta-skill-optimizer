@@ -8,7 +8,7 @@ Meta-Skill Optimizer helps answer a question that ordinary prompt review cannot:
 
 > When individually useful Skills, preferences, prompts, and context rules run together, do they make the Agent better—or get in one another's way?
 
-It imports the complete instruction system into an isolated workspace, maps the role of each component, compares behavior before and after a proposed change, and records whether that change should be accepted, rejected, or investigated further.
+It imports the complete instruction system into an isolated workspace, guides a whole-system review, and keeps behavioral evidence, comparisons, and decisions connected in one Review Session.
 
 ## Why this exists
 
@@ -43,7 +43,7 @@ Complete instruction system
 → Same Cases run against both versions
 → Evidence-backed comparison
 → Accept / Reject / Inconclusive
-→ Feedback informs the next iteration
+→ Feedback is preserved for the next iteration
 ```
 
 The review asks two simple questions before deeper analysis:
@@ -105,7 +105,7 @@ Execute the plan with an Agent or model Runner that follows [`protocol/runner.md
 ```bash
 python3 scripts/review_session.py register-run my-review baseline-result.json
 python3 scripts/review_session.py register-run my-review candidate-result.json
-python3 scripts/compare_results.py baseline-result.json candidate-result.json
+python3 scripts/review_session.py compare my-review --candidate simpler-routing
 ```
 
 ### 4. Record the decision
@@ -117,7 +117,9 @@ python3 scripts/review_session.py decide my-review \
   --reason "Improved the required behavior without a material regression."
 ```
 
-An accepted decision is a recorded conclusion, not permission to modify the live source. Generate a patch for human review when needed:
+The decision must reference the registered Comparison. Acceptance is blocked when the Comparison reports regression or inconclusive evidence unless the reviewer uses an explicit, recorded override. An accepted decision is not permission to modify the live source.
+
+Generate a patch for human review when needed:
 
 ```bash
 python3 scripts/generate_patch.py \
@@ -172,7 +174,7 @@ Read [`protocol/safety.md`](protocol/safety.md) before evaluating private or hig
 
 ## Current limitation
 
-The repository defines a provider-neutral Runner Contract, but does not yet ship a universal adapter for every model or Agent runtime. Model execution and evidence-based behavioral judgment still need an appropriate Runner. Everything around that boundary—import, isolation, planning, validation, comparison, decision recording, and patch generation—is supported.
+The repository defines a provider-neutral Runner Contract, but does not yet ship a universal adapter for every model or Agent runtime. Model execution and evidence-based behavioral judgment still need an appropriate Runner. Whole-system maps and component reviews are guided artifacts rather than automatically generated conclusions. Recorded feedback is preserved but does not yet create the next experiment automatically.
 
 ## License
 

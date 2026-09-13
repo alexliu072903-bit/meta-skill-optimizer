@@ -53,7 +53,7 @@ Silence outside the intended scene is healthy. A capability does not need to be 
 
 ## Close the loop
 
-Do not stop at a static recommendation when the task asks whether a Candidate is better. Preserve raw outputs and behavior evidence, compare identical Case sets, and record one outcome: `accepted`, `rejected`, or `inconclusive`. A recorded decision never applies the Candidate to the source automatically.
+Do not stop at a static recommendation when the task asks whether a Candidate is better. Preserve raw outputs and behavior evidence, register a Comparison inside the Review Session, and record one outcome: `accepted`, `rejected`, or `inconclusive`. Do not silently accept a regression or inconclusive comparison. A recorded decision never applies the Candidate to the source automatically.
 
 ## Output
 

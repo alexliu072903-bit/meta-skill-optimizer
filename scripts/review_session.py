@@ -9,6 +9,7 @@ import tempfile
 from pathlib import Path
 
 from common import ROOT, WORKSPACE, file_digest, load_json, tree_digest, write_json, write_json_file
+from compare_results import compare
 from import_manifest import import_manifest
 from validate_data import validate
 
@@ -63,11 +64,20 @@ def checks_for_result(case: dict) -> dict:
     return result
 
 
-def verify_baseline(root: Path, session: dict) -> None:
-    baseline = root / session["baseline"]["path"]
-    actual = tree_digest(baseline)
-    if actual != session["baseline"]["digest"]:
-        raise SystemExit("Baseline digest changed; restore it before continuing.")
+def verify_artifacts(root: Path, session: dict) -> None:
+    file_artifacts = [session["manifest"], *session.get("runs", []), *session.get("comparisons", [])]
+    if session.get("decision"):
+        file_artifacts.append(session["decision"])
+    for artifact in file_artifacts:
+        path = root / artifact["path"]
+        if not path.is_file() or file_digest(path) != artifact["digest"]:
+            raise SystemExit(f"Registered artifact changed or is missing: {artifact['path']}")
+    tree_artifacts = [session["case_set"], session["baseline"]]
+    tree_artifacts.extend(item for item in session["candidates"] if item.get("status") == "sealed")
+    for artifact in tree_artifacts:
+        path = root / artifact["path"]
+        if not path.is_dir() or tree_digest(path) != artifact["digest"]:
+            raise SystemExit(f"Registered artifact changed or is missing: {artifact['path']}")
 
 
 def initialize(args) -> None:
@@ -85,7 +95,7 @@ def initialize(args) -> None:
         baseline = temporary / "baseline"
         import_manifest(args.manifest, baseline)
         session = {
-            "version": 1,
+            "version": 2,
             "id": args.id,
             "status": "imported",
             "manifest": {"path": "subject.json", "digest": file_digest(manifest_target)},
@@ -96,7 +106,8 @@ def initialize(args) -> None:
             },
             "baseline": {"path": "baseline", "digest": tree_digest(baseline)},
             "candidates": [],
-            "runs": []
+            "runs": [],
+            "comparisons": []
         }
         ensure_schema(session, "session.schema.json")
         write_json_file(temporary / "session.json", session)
@@ -109,7 +120,7 @@ def initialize(args) -> None:
 
 def create_candidate(args) -> None:
     root, session = load_session(args.id)
-    verify_baseline(root, session)
+    verify_artifacts(root, session)
     if not ID.fullmatch(args.name):
         raise SystemExit("Candidate name must use lowercase letters, digits, and hyphens.")
     if any(item["name"] == args.name for item in session["candidates"]):
@@ -138,7 +149,7 @@ def create_candidate(args) -> None:
 
 def seal_candidate(args) -> None:
     root, session = load_session(args.id)
-    verify_baseline(root, session)
+    verify_artifacts(root, session)
     candidate = next((item for item in session["candidates"] if item["name"] == args.name), None)
     if not candidate:
         raise SystemExit(f"Unknown candidate: {args.name}")
@@ -154,7 +165,7 @@ def seal_candidate(args) -> None:
 
 def build_plan(args) -> None:
     root, session = load_session(args.id)
-    verify_baseline(root, session)
+    verify_artifacts(root, session)
     variants = [{"name": "baseline", **session["baseline"]}] + [
         item for item in session["candidates"] if item.get("status") == "sealed"
     ]
@@ -189,10 +200,10 @@ def build_plan(args) -> None:
 
 def register_run(args) -> None:
     root, session = load_session(args.id)
-    verify_baseline(root, session)
+    verify_artifacts(root, session)
     result = load_json(args.result)
     ensure_schema(result, "result.schema.json")
-    if result.get("version") != 1 or result.get("session_id") != session["id"]:
+    if result.get("version") != 2 or result.get("session_id") != session["id"]:
         raise SystemExit("Result version or session id does not match.")
     if result.get("case_set_digest") != session["case_set"]["digest"]:
         raise SystemExit("Result case-set digest does not match the session.")
@@ -201,6 +212,8 @@ def register_run(args) -> None:
     variant = variants.get(result.get("variant"))
     if not variant:
         raise SystemExit(f"Unknown result variant: {result.get('variant')}")
+    if result.get("variant") != "baseline" and variant.get("status") != "sealed":
+        raise SystemExit("A Candidate must be sealed before its run can be registered.")
     if result.get("subject_digest") != variant["digest"]:
         raise SystemExit("Result subject digest does not match the registered variant.")
     expected_cases = case_records(root / session["case_set"]["path"])
@@ -240,26 +253,65 @@ def register_run(args) -> None:
     print(f"Registered run: {destination}")
 
 
+def compare_runs(args) -> None:
+    root, session = load_session(args.id)
+    verify_artifacts(root, session)
+    if args.candidate not in {item["name"] for item in session["candidates"]}:
+        raise SystemExit(f"Unknown candidate: {args.candidate}")
+    runs = {item["variant"]: item for item in session["runs"]}
+    missing = {"baseline", args.candidate} - set(runs)
+    if missing:
+        raise SystemExit(f"Comparison requires registered runs for: {sorted(missing)}")
+    result = compare(
+        load_json(root / runs["baseline"]["path"]),
+        load_json(root / runs[args.candidate]["path"])
+    )
+    ensure_schema(result, "comparison.schema.json")
+    comparison_dir = root / "comparisons"
+    comparison_dir.mkdir(exist_ok=True)
+    destination = comparison_dir / f"{args.candidate}.json"
+    if destination.exists():
+        raise SystemExit(f"Comparison already exists: {destination}")
+    write_json_file(destination, result)
+    session["comparisons"].append({
+        "candidate": args.candidate,
+        "path": f"comparisons/{args.candidate}.json",
+        "digest": file_digest(destination)
+    })
+    session["status"] = "compared"
+    ensure_schema(session, "session.schema.json")
+    write_json_file(root / "session.json", session)
+    write_json(result)
+
+
 def decide(args) -> None:
     root, session = load_session(args.id)
-    verify_baseline(root, session)
-    if args.verdict in {"accepted", "rejected"} and not args.candidate:
-        raise SystemExit("Accepted or rejected decisions require a candidate.")
-    if args.candidate and args.candidate not in {item["name"] for item in session["candidates"]}:
+    verify_artifacts(root, session)
+    if args.candidate not in {item["name"] for item in session["candidates"]}:
         raise SystemExit(f"Unknown candidate: {args.candidate}")
-    registered = {item["variant"] for item in session["runs"]}
-    if args.verdict in {"accepted", "rejected"}:
-        required = {"baseline", args.candidate}
-        if not required.issubset(registered):
-            raise SystemExit(f"Decision requires registered runs for: {sorted(required - registered)}")
+    comparison_record = next(
+        (item for item in session["comparisons"] if item["candidate"] == args.candidate), None
+    )
+    if not comparison_record:
+        raise SystemExit("Decision requires a registered comparison for the Candidate.")
+    comparison = load_json(root / comparison_record["path"])
+    recommendation = comparison["recommendation"]
+    if args.verdict == "accepted" and recommendation != "accepted" and not args.override_comparison:
+        raise SystemExit(
+            f"Comparison recommends {recommendation}; use --override-comparison to accept with an explicit audit record."
+        )
     decision = {
-        "version": 1,
+        "version": 2,
         "session_id": session["id"],
         "candidate": args.candidate or "",
         "decision": args.verdict,
         "reason": args.reason,
         "case_ids": session["case_set"]["case_ids"],
-        "follow_up": args.follow_up or ""
+        "follow_up": args.follow_up or "",
+        "comparison": comparison_record["path"],
+        "comparison_digest": comparison_record["digest"],
+        "comparison_recommendation": recommendation,
+        "override_comparison": args.override_comparison
     }
     ensure_schema(decision, "feedback.schema.json")
     feedback_dir = root / "feedback"
@@ -305,12 +357,18 @@ def main() -> None:
     register.add_argument("result", type=Path)
     register.set_defaults(run=register_run)
 
+    comparison = subparsers.add_parser("compare")
+    comparison.add_argument("id")
+    comparison.add_argument("--candidate", required=True)
+    comparison.set_defaults(run=compare_runs)
+
     decision = subparsers.add_parser("decide")
     decision.add_argument("id")
-    decision.add_argument("--candidate")
+    decision.add_argument("--candidate", required=True)
     decision.add_argument("--verdict", choices=["accepted", "rejected", "inconclusive"], required=True)
     decision.add_argument("--reason", required=True)
     decision.add_argument("--follow-up")
+    decision.add_argument("--override-comparison", action="store_true")
     decision.set_defaults(run=decide)
 
     args = parser.parse_args()

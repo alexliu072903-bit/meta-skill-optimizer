@@ -2,17 +2,20 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Review Feedback",
   "type": "object",
-  "required": ["version", "session_id", "decision", "reason", "case_ids"],
+  "required": ["version", "session_id", "candidate", "decision", "reason", "case_ids", "comparison", "comparison_digest", "comparison_recommendation", "override_comparison"],
   "properties": {
-    "version": {"const": 1},
+    "version": {"const": 2},
     "session_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
     "candidate": {"type": "string"},
     "proposal": {"type": "string"},
     "decision": {"enum": ["accepted", "rejected", "inconclusive", "corrected"]},
     "reason": {"type": "string", "minLength": 1},
     "case_ids": {"type": "array", "items": {"type": "string"}},
-    "follow_up": {"type": "string"}
+    "follow_up": {"type": "string"},
+    "comparison": {"type": "string", "minLength": 1},
+    "comparison_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "comparison_recommendation": {"enum": ["accepted", "rejected", "inconclusive"]},
+    "override_comparison": {"type": "boolean"}
   },
   "additionalProperties": false
 }
-

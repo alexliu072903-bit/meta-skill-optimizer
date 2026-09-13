@@ -2,15 +2,16 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Auditable Behavioral Result Bundle",
   "type": "object",
-  "required": ["version", "session_id", "variant", "subject_digest", "case_set_digest", "cases"],
+  "required": ["version", "session_id", "variant", "subject_digest", "case_set_digest", "runtime", "model", "configuration_digest", "cases"],
   "properties": {
-    "version": {"const": 1},
+    "version": {"const": 2},
     "session_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
     "variant": {"type": "string", "minLength": 1},
     "subject_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "case_set_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-    "runtime": {"type": "string"},
-    "model": {"type": "string"},
+    "runtime": {"type": "string", "minLength": 1},
+    "model": {"type": "string", "minLength": 1},
+    "configuration_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
     "notes": {"type": "string"},
     "cases": {
       "type": "array",
@@ -21,7 +22,7 @@
         "properties": {
           "id": {"type": "string"},
           "case_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
-          "raw_output": {"type": "string"},
+          "raw_output": {"type": "string", "minLength": 1},
           "behavior_checks": {
             "type": "array",
             "minItems": 1,
@@ -32,7 +33,7 @@
                 "behavior": {"type": "string", "minLength": 1},
                 "kind": {"enum": ["must", "must_not"]},
                 "outcome": {"enum": ["pass", "fail", "inconclusive"]},
-                "evidence": {"type": "string"}
+                "evidence": {"type": "string", "minLength": 1}
               },
               "additionalProperties": false
             }
@@ -49,4 +50,3 @@
   },
   "additionalProperties": false
 }
-

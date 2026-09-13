@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Behavioral Comparison",
+  "type": "object",
+  "required": ["version", "session_id", "baseline_variant", "candidate_variant", "cases", "candidate_has_regression", "candidate_has_inconclusive", "candidate_has_improvement", "recommendation"],
+  "properties": {
+    "version": {"const": 2},
+    "session_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "baseline_variant": {"const": "baseline"},
+    "candidate_variant": {"type": "string", "minLength": 1},
+    "cases": {"type": "array", "minItems": 1, "items": {"type": "object"}},
+    "candidate_has_regression": {"type": "boolean"},
+    "candidate_has_inconclusive": {"type": "boolean"},
+    "candidate_has_improvement": {"type": "boolean"},
+    "recommendation": {"enum": ["accepted", "rejected", "inconclusive"]}
+  },
+  "additionalProperties": false
+}

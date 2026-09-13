@@ -43,6 +43,8 @@ Keep the user request, supplied context, model/runtime settings, and authorizati
 
 Baseline and Candidate results must contain exactly the same Case IDs, Case digests, and behavior checks. Missing Cases are failures, not ignorable differences.
 
+Store the Comparison inside the Review Session before recording a decision. Acceptance is blocked by default when the Comparison contains a regression, unresolved behavior, or no observable improvement. A human may override that gate only explicitly; the override and rationale remain part of the feedback artifact.
+
 ## Observation
 
 For each run, record:
