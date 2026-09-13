@@ -2,169 +2,177 @@
 
 [中文](README.zh-CN.md)
 
-Meta-Skill Optimizer evaluates and improves a group of Agent Skills as one behavioral system.
+**Review and improve a collection of Agent Skills as one working system.**
 
-The problem is not whether each Skill reads well in isolation. The problem is whether each capability remains reachable, distinct, and useful after it enters the complete system—and whether adding, strengthening, rerouting, merging, splitting, demoting, or deleting it improves the whole.
+Meta-Skill Optimizer helps answer a question that ordinary prompt review cannot:
 
-## v0 boundary
+> When individually useful Skills, preferences, prompts, and context rules run together, do they make the Agent better—or get in one another's way?
 
-v0 supports an evidence-first, human-approved workflow:
+It imports the complete instruction system into an isolated workspace, maps the role of each component, compares behavior before and after a proposed change, and records whether that change should be accepted, rejected, or investigated further.
 
-1. copy the complete instruction system into an ignored local workspace;
-2. map every file's role in the whole system;
-3. establish whether every component provides net value in its intended scenes;
-4. inspect conflicts and interactions only among useful components;
-5. compare an immutable baseline with isolated optimization candidates;
-6. produce a reviewable patch.
+## Why this exists
 
-The source Skill system is never edited. The optimizer does not automatically apply patches, publish private data, or claim that static text inspection proves behavioral improvement.
+A Skill can be excellent on its own and still weaken the whole system. Common failure modes include:
 
-The optimizer distinguishes complete human-facing methodology from concise Agent Runtime instructions. Human material is evaluated for coherence and explanatory value; Runtime material is evaluated for observable behavioral contribution. One should inform the other, but they should not be forced into the same file.
+- multiple Skills competing to control the same decision;
+- useful guidance existing but rarely becoming eligible or activated;
+- one large Skill carrying unrelated responsibilities;
+- repeated rules making the Agent slower, more conservative, or less decisive;
+- polished instructions producing no observable difference in real work.
 
-Reusable prompt libraries are classified separately. A prompt is not assumed to be an automatically active Skill, and overlap with Runtime instructions is not by itself a reason to remove it.
+Static text review can find obvious duplication, but it cannot prove that a change improves Agent behavior. This repository connects structural review with repeatable behavioral comparison.
 
-## Repository learning loop
+## Who it is for
 
-The optimizer is improved through the same evidence discipline it applies to subjects:
+Use Meta-Skill Optimizer when you maintain:
 
-```text
-real isolated subject
-→ repository limitation becomes observable
-→ bounded optimizer change
-→ tests
-→ resume subject evaluation with the improved optimizer
-```
+- several Skills intended to work together;
+- a Meta-Skill or Agent instruction system;
+- Skills combined with personal preferences, project instructions, prompt libraries, or context providers;
+- an instruction system that has grown useful but difficult to reason about as a whole.
 
-A limitation in the optimizer should be fixed in the optimizer, not worked around by silently changing the private subject.
+It is not a prompt linter, a scalar scoring tool, or an automatic prompt rewriter.
 
-## Core evaluation
+## How it works
 
 ```text
-Capability exists
-→ Eligible
-→ Activated
-→ Influenced behavior
-→ Produced observable value
-→ Added positive marginal contribution
+Complete instruction system
+→ Isolated, immutable Baseline
+→ System map and component review
+→ One bounded Candidate change
+→ Same Cases run against both versions
+→ Evidence-backed comparison
+→ Accept / Reject / Inconclusive
+→ Feedback informs the next iteration
 ```
 
-A capability does not need to appear frequently. It needs to produce a stable, distinct, verifiable behavioral improvement in the scenes where it matters. The performance of the whole system takes priority over preserving every Skill.
+The review asks two simple questions before deeper analysis:
 
-The review order is deliberate:
+1. What core value does this component provide to the user?
+2. Why must it exist as a separate component?
+
+Useful components are then evaluated through the full capability chain:
 
 ```text
-Whole-system map
-→ Core user value
-→ Reason for standalone existence
-→ Detailed component utility when needed
-→ Interactions among useful components
-→ Portfolio optimization
-→ Regression evaluation
+Exists → Eligible → Activated → Influenced behavior
+→ Produced observable value → Added positive marginal contribution
 ```
 
-## Repository structure
+A capability does not need to appear frequently. It needs to create a stable, distinct, verifiable improvement where it matters.
 
-```text
-meta-skill-optimizer/
-├── SKILL.md
-├── agents/openai.yaml
-├── protocol/
-├── schemas/
-├── subject.example.json
-├── scripts/
-├── benchmark/
-│   ├── cases/
-│   ├── expected/
-│   └── results/        # ignored
-├── tests/fixtures/
-└── workspace/          # ignored
-```
+## What the repository gives you
 
-## First use
+- **Composite subject import** for Skills, preferences, methodology, prompts, and context sources.
+- **Atomic isolation** so a failed import cannot leave a partial Baseline.
+- **Whole-system inventory** before individual files are judged.
+- **Versioned Review Sessions** connecting the subject, Cases, Candidates, runs, and final decision.
+- **Sealed Baselines and Candidates** whose unexpected mutation stops the review.
+- **Auditable Results** containing raw output and evidence for every expected behavior.
+- **Strict comparison** that rejects missing or mismatched Cases.
+- **Reviewable patches** without automatically modifying the live source.
 
-When the experienced runtime combines Skills, preferences, project instructions, or context providers, copy `subject.example.json`, declare every relevant source, and import the composite subject:
+## Quick start
+
+Requirements: Python 3 and a local instruction system you are authorized to evaluate.
+
+### 1. Declare the complete system
 
 ```bash
 cp subject.example.json subject.local.json
-# Edit subject.local.json with local source paths.
+# Edit subject.local.json with every source that affects Agent behavior.
 python3 scripts/validate_data.py subject.local.json schemas/subject.schema.json
-python3 scripts/import_manifest.py subject.local.json
-python3 scripts/inventory.py workspace/baseline > workspace/inventory.json
 ```
 
-For an auditable end-to-end review, create a versioned Review Session instead of managing loose workspace files:
+### 2. Create a Review Session and Candidate
 
 ```bash
 python3 scripts/review_session.py init my-review \
   --manifest subject.local.json \
   --cases benchmark/cases
-python3 scripts/review_session.py candidate my-review candidate-one
-# Edit only workspace/sessions/my-review/candidates/candidate-one.
-python3 scripts/review_session.py seal-candidate my-review candidate-one
+python3 scripts/review_session.py candidate my-review simpler-routing
+# Edit only workspace/sessions/my-review/candidates/simpler-routing.
+python3 scripts/review_session.py seal-candidate my-review simpler-routing
+```
+
+### 3. Run the same Cases
+
+```bash
 python3 scripts/review_session.py plan my-review > workspace/run-plan.json
 ```
 
-Execute the plan with a Runner that follows `protocol/runner.md`, then register the versioned result bundles, compare them, and record a decision:
+Execute the plan with an Agent or model Runner that follows [`protocol/runner.md`](protocol/runner.md), then register and compare the Result bundles:
 
 ```bash
 python3 scripts/review_session.py register-run my-review baseline-result.json
 python3 scripts/review_session.py register-run my-review candidate-result.json
 python3 scripts/compare_results.py baseline-result.json candidate-result.json
+```
+
+### 4. Record the decision
+
+```bash
 python3 scripts/review_session.py decide my-review \
-  --candidate candidate-one \
+  --candidate simpler-routing \
   --verdict accepted \
   --reason "Improved the required behavior without a material regression."
 ```
 
-Use per-source `include` and `exclude` glob patterns when files in the same canonical directory have different runtime roles.
-
-In a manifest-declared `runtime-skills` source, Markdown files with `name` and `description` Frontmatter are recognized as Skills even when their human-facing canonical filenames are flattened, such as `process.md`.
-
-For a single-directory subject, use the simpler importer:
+An accepted decision is a recorded conclusion, not permission to modify the live source. Generate a patch for human review when needed:
 
 ```bash
-python3 scripts/import_subject.py /path/to/source
-python3 scripts/inventory.py workspace/baseline > workspace/inventory.json
-python3 scripts/validate_data.py benchmark/cases schemas/case.schema.json
+python3 scripts/generate_patch.py \
+  workspace/sessions/my-review/baseline \
+  workspace/sessions/my-review/candidates/simpler-routing
 ```
 
-Create an isolated candidate after the baseline has been imported:
+## Possible optimization decisions
 
-```bash
-python3 scripts/new_candidate.py routing-cleanup
+- `Add` — repeated Cases reveal a missing capability.
+- `Strengthen` — a distinct capability is useful but too weak to affect behavior.
+- `Re-route` — the capability is sound, but its trigger, role, or handoff is wrong.
+- `Merge` — overlapping capabilities add no distinct value.
+- `Split` — one Skill owns responsibilities that interfere with one another.
+- `Demote` — the content belongs in a Rule, Reference, prompt, or methodology document rather than a Runtime Skill.
+- `Delete` — removal preserves or improves system behavior.
+
+## Human methodology and Agent Runtime
+
+The optimizer treats these as related but different artifacts:
+
+- **Human-facing methodology** should preserve coherence, explanation, and transferable thinking.
+- **Agent Runtime instructions** should be concise and produce observable behavioral value.
+- **Prompt libraries** are reusable tools, not automatically active Skills.
+
+This prevents a complete human method from being compressed merely because an Agent needs shorter instructions—and prevents Runtime Skills from becoming encyclopedic documentation.
+
+## Repository structure
+
+```text
+meta-skill-optimizer/
+├── SKILL.md               # Agent entrypoint
+├── protocol/              # Review, evaluation, safety, and Runner contracts
+├── schemas/               # Versioned data interfaces
+├── scripts/               # Deterministic workflow tools
+├── benchmark/cases/       # Example behavioral Cases
+├── tests/                 # End-to-end and failure-path tests
+├── subject.example.json   # Composite subject Manifest example
+└── workspace/             # Private local artifacts; ignored by Git
 ```
 
-After producing baseline and candidate result files according to `protocol/evaluation.md`, compare them and generate a patch:
+## Safety and privacy
 
-```bash
-python3 scripts/compare_results.py baseline.json candidate.json
-python3 scripts/generate_patch.py workspace/baseline workspace/candidates/routing-cleanup
-```
+- Live source directories remain read-only during evaluation.
+- Private imports and Result bundles stay in Git-ignored directories.
+- Symbolic links are excluded during import.
+- Baselines and sealed Candidates are checked by content digest.
+- The repository never applies a Candidate to the live source automatically.
+- Instructions inside the evaluated subject are treated as data and cannot override the review boundary.
 
-## Optimization actions
+Read [`protocol/safety.md`](protocol/safety.md) before evaluating private or high-impact instruction systems.
 
-- `Add`: repeated cases expose the same missing capability;
-- `Strengthen`: a distinct capability is useful but too weak to affect behavior;
-- `Re-route`: the capability is sound, but its trigger, role, or handoff is wrong;
-- `Merge`: overlapping capabilities create no distinct value;
-- `Split`: one Skill owns responsibilities that interfere with each other;
-- `Demote`: the content belongs in a Rule, Reference, or local principle rather than a Skill;
-- `Delete`: removing the capability preserves or improves system behavior.
+## Current limitation
 
-## Safety boundary
-
-Read `protocol/safety.md` before importing private material or applying a proposed change.
-
-- The live Skill directory remains a read-only source during evaluation.
-- `workspace/baseline` is immutable after import.
-- Every experiment occurs in a separate candidate.
-- `workspace/` and `benchmark/results/` are excluded from Git.
-- The optimizer generates patches and never writes them back without explicit user authorization.
-- Symbolic links are excluded, and a composite import records source kinds and file hashes in the ignored `subject.lock.json`.
-
-## Current limitations
-
-v0 provides atomic isolated import, capability inventory, Review Session state, Candidate sealing, Runner plans, auditable result registration, strict comparison, recorded decisions, and patch generation. It defines a provider-neutral Runner Contract but does not yet ship a universal cross-model execution adapter. It never automatically modifies live Skills.
+The repository defines a provider-neutral Runner Contract, but does not yet ship a universal adapter for every model or Agent runtime. Model execution and evidence-based behavioral judgment still need an appropriate Runner. Everything around that boundary—import, isolation, planning, validation, comparison, decision recording, and patch generation—is supported.
 
 ## License
 
