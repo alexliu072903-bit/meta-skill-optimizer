@@ -54,7 +54,9 @@ The review order is deliberate:
 
 ```text
 Whole-system map
-→ Component utility
+→ Core user value
+→ Reason for standalone existence
+→ Detailed component utility when needed
 → Interactions among useful components
 → Portfolio optimization
 → Regression evaluation

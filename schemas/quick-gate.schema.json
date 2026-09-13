@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Two-Question Component Gate",
+  "type": "object",
+  "required": [
+    "id",
+    "source",
+    "core_user_value",
+    "value_evidence",
+    "standalone_reason",
+    "verdict",
+    "next_action"
+  ],
+  "properties": {
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "source": {"type": "string", "minLength": 1},
+    "core_user_value": {"type": "string", "minLength": 1},
+    "value_evidence": {"type": "array", "items": {"type": "string"}},
+    "standalone_reason": {"type": "string", "minLength": 1},
+    "verdict": {"enum": ["independent", "merge-or-demote", "archive", "needs-evidence"]},
+    "next_action": {"type": "string", "minLength": 1}
+  },
+  "additionalProperties": false
+}
+

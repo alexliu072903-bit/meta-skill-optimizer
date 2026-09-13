@@ -80,9 +80,19 @@ candidate = {
     "reason": "No behavioral comparison has run yet",
     "interaction_review_ready": False
 }))
+(root / "quick-gate.json").write_text(json.dumps({
+    "id": "alpha",
+    "source": "alpha/SKILL.md",
+    "core_user_value": "Provide one observable synthetic outcome",
+    "value_evidence": [],
+    "standalone_reason": "It may require a distinct trigger, but evidence is not available yet",
+    "verdict": "needs-evidence",
+    "next_action": "Run the smallest no-component versus component comparison"
+}))
 (root / "baseline.json").write_text(json.dumps(baseline))
 (root / "candidate.json").write_text(json.dumps(candidate))
 PY
+python3 "$ROOT/scripts/validate_data.py" "$TMP_DIR/quick-gate.json" "$ROOT/schemas/quick-gate.schema.json"
 python3 "$ROOT/scripts/validate_data.py" "$TMP_DIR/component-review.json" "$ROOT/schemas/component-review.schema.json"
 python3 "$ROOT/scripts/validate_data.py" "$TMP_DIR/baseline.json" "$ROOT/schemas/result.schema.json"
 python3 "$ROOT/scripts/validate_data.py" "$TMP_DIR/candidate.json" "$ROOT/schemas/result.schema.json"

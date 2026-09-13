@@ -4,7 +4,7 @@ Optimize total system capability relative to complexity, not the number of Skill
 
 ## Entry gate
 
-Do not optimize interactions before reviewing the whole system and establishing provisional utility for every included file. First decide whether a component should exist; only then decide how useful components should work together.
+Do not optimize interactions before reviewing the whole system and applying the Two-Question Quick Gate to every included file. First decide what user value a component provides and whether it deserves standalone existence; only then decide how independent useful components should work together.
 
 Structural defects such as missing dependencies may be recorded immediately, but they do not justify preserving or repairing the affected component until its utility is supported.
 

@@ -17,6 +17,7 @@ Optimize the behavior of the complete Skill system, not the apparent quality or 
 
 ## Choose the needed operation
 
+- For a fast first-pass decision on any component, read [protocol/quick-gate.md](protocol/quick-gate.md) and answer only its two questions before deeper review.
 - When a subject mixes complete human methods with executable Agent instructions, read [protocol/audience-separation.md](protocol/audience-separation.md) before judging verbosity or duplication.
 - For a complete portfolio review, read [protocol/system-review.md](protocol/system-review.md) and follow its stage gates in order.
 - For inventory, reachability, role, overlap, or dependency analysis, read [protocol/capability-model.md](protocol/capability-model.md).

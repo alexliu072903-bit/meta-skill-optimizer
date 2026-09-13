@@ -21,6 +21,13 @@ One file may serve more than one function, but every additional responsibility i
 
 ## Stage 2 — Establish component utility
 
+Start every component with the [Two-Question Quick Gate](quick-gate.md):
+
+1. What core value does it provide to the user?
+2. Why must it exist as an independent component?
+
+Archive components with no user value. Merge or demote useful content that lacks a standalone reason. Run the detailed review below only for independent components or when evidence is genuinely insufficient.
+
 Review every file, including files that are not discoverable Skills. For each file ask:
 
 1. What real problem and scene justify its existence?
