@@ -24,6 +24,15 @@
             ]
           },
           "path": {"type": "string", "minLength": 1},
+          "include": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1},
+            "minItems": 1
+          },
+          "exclude": {
+            "type": "array",
+            "items": {"type": "string", "minLength": 1}
+          },
           "required": {"type": "boolean", "default": true},
           "description": {"type": "string"}
         },
@@ -33,4 +42,3 @@
   },
   "additionalProperties": false
 }
-

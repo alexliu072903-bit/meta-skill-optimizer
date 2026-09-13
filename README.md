@@ -62,6 +62,8 @@ python3 scripts/import_manifest.py subject.local.json
 python3 scripts/inventory.py workspace/baseline > workspace/inventory.json
 ```
 
+Use per-source `include` and `exclude` glob patterns when files in the same canonical directory have different runtime roles.
+
 For a single-directory subject, use the simpler importer:
 
 ```bash

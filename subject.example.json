@@ -6,6 +6,7 @@
       "id": "meta-skills",
       "kind": "runtime-skills",
       "path": "/path/to/meta-skills",
+      "include": ["SKILL*.md", "*/SKILL.md"],
       "required": true,
       "description": "Runtime Skill entrypoints and their directly bundled resources"
     },
@@ -32,4 +33,3 @@
     }
   ]
 }
-

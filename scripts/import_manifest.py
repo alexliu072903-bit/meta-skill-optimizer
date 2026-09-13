@@ -9,7 +9,7 @@ import shutil
 from pathlib import Path
 
 from common import WORKSPACE, load_json, require_empty_or_missing
-from import_subject import ignored
+from import_subject import IGNORED_NAMES
 
 
 KINDS = {
@@ -34,14 +34,46 @@ def digest(path: Path) -> str:
     return value.hexdigest()
 
 
-def copy_source(source: Path, target: Path) -> None:
+def matches(path: Path, patterns: list[str]) -> bool:
+    value = path.as_posix()
+    return any(
+        path.match(pattern)
+        or (pattern.startswith("**/") and path.match(pattern[3:]))
+        or value == pattern
+        for pattern in patterns
+    )
+
+
+def excluded(path: Path) -> bool:
+    return any(part in IGNORED_NAMES for part in path.parts) or path.name.endswith(".pyc")
+
+
+def copy_source(source: Path, target: Path, includes: list[str], excludes: list[str]) -> None:
     if source.is_symlink():
         raise SystemExit(f"Refusing to import symbolic link: {source}")
     if source.is_file():
+        relative = Path(source.name)
+        if includes and not matches(relative, includes):
+            return
+        if excludes and matches(relative, excludes):
+            return
         target.mkdir(parents=True)
         shutil.copy2(source, target / source.name)
         return
-    shutil.copytree(source, target, ignore=ignored, dirs_exist_ok=False)
+    target.mkdir(parents=True)
+    for path in sorted(source.rglob("*")):
+        if not path.is_file() or path.is_symlink():
+            continue
+        relative = path.relative_to(source)
+        if excluded(relative):
+            continue
+        if includes and not matches(relative, includes):
+            continue
+        if excludes and matches(relative, excludes):
+            continue
+        destination = target / relative
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(path, destination)
 
 
 def main() -> None:
@@ -95,11 +127,13 @@ def main() -> None:
             "required": required,
             "present": source.exists(),
             "description": item.get("description", ""),
+            "include": item.get("include", []),
+            "exclude": item.get("exclude", []),
             "files": []
         }
         if source.exists():
             target = sources_root / source_id
-            copy_source(source, target)
+            copy_source(source, target, record["include"], record["exclude"])
             for path in sorted(target.rglob("*")):
                 if path.is_file() and not path.is_symlink():
                     record["files"].append({
@@ -122,4 +156,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

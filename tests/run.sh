@@ -22,7 +22,7 @@ manifest = {
     "version": 1,
     "id": "synthetic-system",
     "sources": [
-        {"id": "skills", "kind": "runtime-skills", "path": str(root / "tests/fixtures/subject")},
+        {"id": "skills", "kind": "runtime-skills", "path": str(root / "tests/fixtures/subject"), "include": ["alpha/SKILL.md"]},
         {"id": "prefer", "kind": "preference", "path": str(root / "tests/fixtures/prefer.md")},
         {"id": "optional-context", "kind": "context-provider", "path": str(temp / "missing"), "required": False}
     ]
@@ -45,7 +45,8 @@ assert inventory["skills"][0]["name"] == "alpha"
 
 composite = json.loads((root / "composite-inventory.json").read_text())
 assert composite["source_count"] == 3
-assert composite["skill_count"] == 2
+assert composite["skill_count"] == 1
+assert composite["skills"][0]["name"] == "alpha"
 assert composite["instruction_document_count"] == 1
 assert composite["instruction_documents"][0]["source_kind"] == "preference"
 

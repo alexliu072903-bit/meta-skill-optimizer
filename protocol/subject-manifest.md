@@ -16,6 +16,8 @@ Include a source only when it is normally available in at least one representati
 
 Mark a source `required: false` only when its absence should not block import. A missing optional source is recorded in `subject.lock.json`; a missing required source stops before any baseline is created.
 
+For a directory source, optional `include` and `exclude` arrays select relative paths with glob patterns. Use them when one canonical directory contains files with different runtime roles. Exclusion wins over inclusion. Files omitted by selectors are not copied and cannot affect analysis.
+
 ## Import result
 
 `scripts/import_manifest.py` copies each source into:
@@ -28,7 +30,6 @@ workspace/baseline/
     └── ...
 ```
 
-The lock records the resolved source path, source type, copied file count, and SHA-256 digest of every copied regular file. It remains inside the ignored workspace and must not be committed.
+The lock records the resolved source path, source type, selectors, copied file count, and SHA-256 digest of every copied regular file. It remains inside the ignored workspace and must not be committed.
 
 The manifest defines evaluation inputs; it does not establish instruction priority. Record precedence as a capability relationship only when the runtime or an authoritative instruction source actually defines it.
-
