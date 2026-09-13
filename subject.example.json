@@ -25,6 +25,13 @@
       "description": "Project-scoped instructions used in representative tasks"
     },
     {
+      "id": "methodology",
+      "kind": "human-methodology",
+      "path": "/path/to/methodology",
+      "required": false,
+      "description": "Complete philosophy, methods, rationale, and examples for human readers"
+    },
+    {
       "id": "context-provider",
       "kind": "context-provider",
       "path": "/path/to/context-skill",

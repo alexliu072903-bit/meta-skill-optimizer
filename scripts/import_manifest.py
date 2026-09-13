@@ -14,7 +14,7 @@ from import_subject import IGNORED_NAMES
 
 KINDS = {
     "runtime-skills", "preference", "project-instructions",
-    "context-provider", "other"
+    "context-provider", "human-methodology", "other"
 }
 ID = re.compile(r"^[a-z0-9][a-z0-9-]*$")
 

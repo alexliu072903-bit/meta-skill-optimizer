@@ -8,6 +8,7 @@ Use `schemas/subject.schema.json` and `subject.example.json` to declare the subj
 - `preference`: always-on personal behavior and expression rules;
 - `project-instructions`: repository or task-scoped Agent instructions;
 - `context-provider`: a capability that retrieves or writes context;
+- `human-methodology`: philosophy, rationale, examples, and complete methods intended primarily for people;
 - `other`: a relevant instruction source that does not fit the above types.
 
 ## Inclusion rule

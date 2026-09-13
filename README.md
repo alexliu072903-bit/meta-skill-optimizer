@@ -19,6 +19,8 @@ v0 supports an evidence-first, human-approved workflow:
 
 The source Skill system is never edited. The optimizer does not automatically apply patches, publish private data, or claim that static text inspection proves behavioral improvement.
 
+The optimizer distinguishes complete human-facing methodology from concise Agent Runtime instructions. Human material is evaluated for coherence and explanatory value; Runtime material is evaluated for observable behavioral contribution. One should inform the other, but they should not be forced into the same file.
+
 ## Repository learning loop
 
 The optimizer is improved through the same evidence discipline it applies to subjects:

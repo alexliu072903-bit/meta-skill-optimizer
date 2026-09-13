@@ -2,6 +2,8 @@
 
 Review every declared file together before changing any one of them. The goal is not perfect mechanical coupling; it is a system whose parts are individually justified and collectively coherent.
 
+Before evaluating utility, classify each file's audience using [audience-separation.md](audience-separation.md). Human methodology and Agent Runtime require different success criteria; apparent duplication across them is not automatically a Runtime conflict.
+
 ## Stage 1 — Model the whole system
 
 Start with the system purpose and map every file to the function it claims to perform. Use a control-system lens only where it clarifies real behavior:
@@ -26,6 +28,8 @@ Review every file, including files that are not discoverable Skills. For each fi
 3. Is that difference observable in a representative case?
 4. What rigidity, latency, context load, maintenance, or autonomy cost does it add?
 5. Is its useful behavior distinct, or would the base Agent or another simpler instruction already provide it?
+
+For `human-methodology`, replace the behavioral-delta test with: does this material help a person understand, challenge, teach, or evolve the method? Do not require a human document to justify itself as an always-loaded Runtime instruction.
 
 Use a no-component or simpler-instruction comparison when behavior is uncertain. "Well written" and "contains good ideas" are not evidence of utility.
 
@@ -63,4 +67,3 @@ Produce:
 2. one component review for every included file;
 3. an interaction review limited to components with supported utility;
 4. bounded optimization proposals with acceptance and rejection evidence.
-

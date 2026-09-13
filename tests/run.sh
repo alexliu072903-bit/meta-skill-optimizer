@@ -24,6 +24,7 @@ manifest = {
     "sources": [
         {"id": "skills", "kind": "runtime-skills", "path": str(root / "tests/fixtures/subject"), "include": ["alpha/SKILL.md"]},
         {"id": "prefer", "kind": "preference", "path": str(root / "tests/fixtures/prefer.md")},
+        {"id": "methodology", "kind": "human-methodology", "path": str(root / "tests/fixtures/methodology.md")},
         {"id": "optional-context", "kind": "context-provider", "path": str(temp / "missing"), "required": False}
     ]
 }
@@ -44,11 +45,11 @@ assert inventory["skill_count"] == 2
 assert inventory["skills"][0]["name"] == "alpha"
 
 composite = json.loads((root / "composite-inventory.json").read_text())
-assert composite["source_count"] == 3
+assert composite["source_count"] == 4
 assert composite["skill_count"] == 1
 assert composite["skills"][0]["name"] == "alpha"
-assert composite["instruction_document_count"] == 1
-assert composite["instruction_documents"][0]["source_kind"] == "preference"
+assert composite["instruction_document_count"] == 2
+assert {item["source_kind"] for item in composite["instruction_documents"]} == {"preference", "human-methodology"}
 
 baseline = {
     "variant": "baseline",
