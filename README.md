@@ -4,7 +4,7 @@
 
 A small Agent Skill and local toolkit for reviewing and improving a collection of Agent Skills as one behavioral system.
 
-An individual Skill can look excellent while the complete system becomes slower, more rigid, or less decisive. Without Meta-Skill Optimizer, instruction systems are usually edited by intuition. With it, every proposed change is compared against an immutable Baseline using the same behavioral Cases.
+An individual Skill can look excellent while the complete system becomes slower, more rigid, or less decisive. Without Meta-Skill Optimizer, instruction systems are usually edited by intuition. With it, every proposed change is isolated from an immutable Baseline and evaluated with structural evidence and, when comparable execution is available, the same behavioral Cases.
 
 The review mechanism:
 
@@ -19,39 +19,26 @@ The goal is not a prettier collection of prompts. It is a simpler, more capable 
 
 ## Use
 
-Clone the repository and declare every instruction source that materially affects Agent behavior:
+Make the repository available to Codex or Claude Code as a Skill, then give the Agent the directory:
 
-```bash
-git clone https://github.com/alexliu072903-bit/meta-skill-optimizer.git
-cd meta-skill-optimizer
-cp subject.example.json subject.local.json
-# Add local source paths to subject.local.json.
-python3 scripts/validate_data.py subject.local.json schemas/subject.schema.json
+```text
+Review the Skill system in /path/to/skills and optimize it into a better version.
 ```
 
-Create a Review Session and one isolated Candidate:
+The Agent owns the workflow:
 
-```bash
-python3 scripts/review_session.py init my-review \
-  --manifest subject.local.json \
-  --cases benchmark/cases
-python3 scripts/review_session.py candidate my-review simpler-system
-# Edit only workspace/sessions/my-review/candidates/simpler-system.
-python3 scripts/review_session.py seal-candidate my-review simpler-system
-python3 scripts/review_session.py plan my-review > workspace/run-plan.json
+```text
+read the complete system
+→ build the system map
+→ find the highest-impact problem
+→ create an isolated Candidate
+→ run the necessary before-and-after comparison
+→ return the Candidate, Diff, and evidence
 ```
 
-Execute the Plan with an Agent that follows [`protocol/runner.md`](protocol/runner.md), then register the Results, compare them, and record a decision:
+The user does not need to prepare a Manifest, Cases, JSON Results, or CLI commands when the Agent can do that work. The live source remains unchanged; the user decides whether and how to apply the Candidate.
 
-```bash
-python3 scripts/review_session.py register-run my-review baseline-result.json
-python3 scripts/review_session.py register-run my-review candidate-result.json
-python3 scripts/review_session.py compare my-review --candidate simpler-system
-python3 scripts/review_session.py decide my-review --candidate simpler-system \
-  --verdict accepted --reason "Improved behavior without a material regression."
-```
-
-The live source is never modified automatically. Private subjects, Results, and Review Sessions remain in the Git-ignored local `workspace/`.
+For tool maintenance or custom integration, see the [manual workflow](protocol/manual-workflow.md).
 
 ## Repository layout
 
@@ -60,6 +47,7 @@ meta-skill-optimizer/
 ├── SKILL.md
 ├── protocol/
 │   ├── system-review.md
+│   ├── agent-workflow.md
 │   ├── evaluation.md
 │   ├── runner.md
 │   └── safety.md
@@ -76,7 +64,9 @@ Use [`SKILL.md`](SKILL.md) as the Agent entrypoint. The files under `protocol/` 
 
 Meta-Skill Optimizer is experimental. Import, isolation, Review Sessions, validation, comparison, decision recording, and patch generation are available today.
 
-Native Codex and Claude Code execution adapters are not implemented yet. The repository will support only these two Runtimes. It stores Feedback but does not automatically turn it into new Cases or Candidates; that decision belongs to the person using the repository and their Agent.
+The Agent-owned structural review and Candidate workflow are available today. Native Codex and Claude Code adapters for fully isolated behavioral execution are not implemented yet. When comparable execution is unavailable, the Agent must label behavioral impact as unverified rather than claim an observed improvement.
+
+The repository stores Feedback but does not automatically turn it into new Cases or Candidates; that decision belongs to the person using it and their Agent.
 
 ## License
 

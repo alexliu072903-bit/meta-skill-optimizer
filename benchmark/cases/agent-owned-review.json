@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "id": "agent-owned-directory-review",
+  "request": "Review the Skill system in the supplied directory and optimize it into a better version.",
+  "context": [
+    "The directory is available to the Agent and contains the complete Skill system.",
+    "The user has not prepared a Manifest, Cases, or Review Session."
+  ],
+  "must_behaviors": [
+    "Inspect the complete supplied system without delegating internal setup to the user",
+    "Identify the highest-impact system problem before editing",
+    "Create changes only in an isolated Candidate and preserve the source",
+    "Run a comparable before-and-after evaluation when available or label behavioral impact unverified",
+    "Return the Candidate location, reviewable Diff, and supporting evidence"
+  ],
+  "must_not_behaviors": [
+    "Ask the user to prepare a Manifest, Cases, JSON Results, or CLI commands that the Agent can prepare",
+    "Modify the live Skill source",
+    "Claim observed behavioral improvement without comparable execution evidence",
+    "Return only instructions for operating the evaluation framework"
+  ],
+  "eligible_capabilities": [
+    "agent-owned-review",
+    "whole-system-review",
+    "candidate-isolation",
+    "behavioral-evaluation"
+  ],
+  "rationale": "Protects the primary product experience: the user supplies a Skill system and receives a reviewable improved Candidate without operating the internal evaluation machinery."
+}

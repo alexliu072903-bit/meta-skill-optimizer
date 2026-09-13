@@ -4,7 +4,7 @@
 
 一个轻量的 Agent Skill 和本地工具集，用来把一组 Agent Skills 作为一个完整的行为系统进行审查和优化。
 
-一个 Skill 单独看可能非常优秀，但整套系统却可能变得更慢、更僵化或更难做出明确判断。不使用 Meta-Skill Optimizer 时，我们通常依靠直觉修改指令；使用它之后，每次改动都会使用相同的行为 Cases，与不可变 Baseline 进行对照。
+一个 Skill 单独看可能非常优秀，但整套系统却可能变得更慢、更僵化或更难做出明确判断。不使用 Meta-Skill Optimizer 时，我们通常依靠直觉修改指令；使用它之后，每次改动都会与不可变 Baseline 隔离，并使用结构证据，以及在可比执行条件成立时使用相同的行为 Cases 进行评估。
 
 这套审查机制会：
 
@@ -19,39 +19,26 @@
 
 ## 使用
 
-克隆仓库，并声明所有会实质影响 Agent 行为的指令来源：
+把这个仓库作为 Skill 提供给 Codex 或 Claude Code，然后把目录交给 Agent：
 
-```bash
-git clone https://github.com/alexliu072903-bit/meta-skill-optimizer.git
-cd meta-skill-optimizer
-cp subject.example.json subject.local.json
-# 在 subject.local.json 中填写本地来源路径。
-python3 scripts/validate_data.py subject.local.json schemas/subject.schema.json
+```text
+帮我审查 /path/to/skills 目录下的 Skill 系统，并优化出一个更好的版本。
 ```
 
-创建一个 Review Session 和一个隔离的 Candidate：
+Agent 在内部完成：
 
-```bash
-python3 scripts/review_session.py init my-review \
-  --manifest subject.local.json \
-  --cases benchmark/cases
-python3 scripts/review_session.py candidate my-review simpler-system
-# 只修改 workspace/sessions/my-review/candidates/simpler-system。
-python3 scripts/review_session.py seal-candidate my-review simpler-system
-python3 scripts/review_session.py plan my-review > workspace/run-plan.json
+```text
+读取完整系统
+→ 建立系统图
+→ 找出最重要的问题
+→ 创建隔离 Candidate
+→ 执行必要的前后对照
+→ 给出 Candidate、Diff 和证据
 ```
 
-使用遵循 [`protocol/runner.md`](protocol/runner.md) 的 Agent 执行 Plan，然后注册 Results、完成比较并记录决策：
+当 Agent 可以自行完成时，用户不需要准备 Manifest、Cases、JSON Results 或 CLI 命令。正式来源保持不变，用户决定是否以及如何采用 Candidate。
 
-```bash
-python3 scripts/review_session.py register-run my-review baseline-result.json
-python3 scripts/review_session.py register-run my-review candidate-result.json
-python3 scripts/review_session.py compare my-review --candidate simpler-system
-python3 scripts/review_session.py decide my-review --candidate simpler-system \
-  --verdict accepted --reason "行为得到改善，并且没有重要回归。"
-```
-
-仓库不会自动修改正式来源。私人测试对象、Results 和 Review Sessions 都保存在 Git 默认忽略的本地 `workspace/` 中。
+需要维护底层工具或自定义集成时，查看[手动工作流](protocol/manual-workflow.md)。
 
 ## 仓库结构
 
@@ -60,6 +47,7 @@ meta-skill-optimizer/
 ├── SKILL.md
 ├── protocol/
 │   ├── system-review.md
+│   ├── agent-workflow.md
 │   ├── evaluation.md
 │   ├── runner.md
 │   └── safety.md
@@ -76,7 +64,9 @@ Agent 以 [`SKILL.md`](SKILL.md) 作为入口。`protocol/` 中保存完整的�
 
 Meta-Skill Optimizer 目前处于实验阶段。导入、隔离、Review Session、校验、比较、决策记录和 Patch 生成已经可用。
 
-Codex 和 Claude Code 的原生执行 Adapter 尚未实现。仓库未来只支持这两个 Runtime。系统会保存 Feedback，但不会自动把它转化成新 Case 或 Candidate；这项判断留给实际使用者和他的 Agent。
+Agent 主导的结构审查和 Candidate 工作流已经可用。用于完整隔离行为执行的 Codex 与 Claude Code 原生 Adapter 尚未实现。当无法完成可比执行时，Agent 必须把行为影响标记为未经验证，不能声称已经观察到改善。
+
+系统会保存 Feedback，但不会自动把它转化成新 Case 或 Candidate；这项判断留给实际使用者和他的 Agent。
 
 ## License
 
