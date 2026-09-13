@@ -15,6 +15,8 @@ Optimize the behavior of the complete Skill system, not the apparent quality or 
 4. Preserve an immutable baseline. Put each proposed change in a separate candidate.
 5. Never apply a candidate to the source automatically. Produce a patch for review.
 
+For work that spans import, Candidate creation, behavior runs, and a decision, use `scripts/review_session.py` so every artifact remains connected to one versioned Review Session. Read [protocol/runner.md](protocol/runner.md) before preparing or registering behavior runs.
+
 ## Choose the needed operation
 
 - For a fast first-pass decision on any component, read [protocol/quick-gate.md](protocol/quick-gate.md) and answer only its two questions before deeper review.
@@ -48,6 +50,10 @@ exists → eligible → activated → influenced behavior
 ```
 
 Silence outside the intended scene is healthy. A capability does not need to be frequently visible; it needs to create a stable, distinct, verifiable improvement when relevant.
+
+## Close the loop
+
+Do not stop at a static recommendation when the task asks whether a Candidate is better. Preserve raw outputs and behavior evidence, compare identical Case sets, and record one outcome: `accepted`, `rejected`, or `inconclusive`. A recorded decision never applies the Candidate to the source automatically.
 
 ## Output
 

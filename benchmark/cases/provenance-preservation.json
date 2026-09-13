@@ -1,4 +1,5 @@
 {
+  "version": 1,
   "id": "provenance-preservation",
   "request": "Review two templates. One is sparse and one is comprehensive; the user says one came from a frequently used real workflow but does not identify which file.",
   "context": [

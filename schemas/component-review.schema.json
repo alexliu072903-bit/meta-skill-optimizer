@@ -3,6 +3,7 @@
   "title": "Component Utility Review",
   "type": "object",
   "required": [
+    "version",
     "id",
     "source",
     "claimed_purpose",
@@ -14,6 +15,7 @@
     "reason"
   ],
   "properties": {
+    "version": {"const": 1},
     "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
     "source": {"type": "string", "minLength": 1},
     "claimed_purpose": {"type": "string", "minLength": 1},
@@ -27,4 +29,3 @@
   },
   "additionalProperties": false
 }
-

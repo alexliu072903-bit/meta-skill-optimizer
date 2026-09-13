@@ -92,6 +92,30 @@ python3 scripts/import_manifest.py subject.local.json
 python3 scripts/inventory.py workspace/baseline > workspace/inventory.json
 ```
 
+For an auditable end-to-end review, create a versioned Review Session instead of managing loose workspace files:
+
+```bash
+python3 scripts/review_session.py init my-review \
+  --manifest subject.local.json \
+  --cases benchmark/cases
+python3 scripts/review_session.py candidate my-review candidate-one
+# Edit only workspace/sessions/my-review/candidates/candidate-one.
+python3 scripts/review_session.py seal-candidate my-review candidate-one
+python3 scripts/review_session.py plan my-review > workspace/run-plan.json
+```
+
+Execute the plan with a Runner that follows `protocol/runner.md`, then register the versioned result bundles, compare them, and record a decision:
+
+```bash
+python3 scripts/review_session.py register-run my-review baseline-result.json
+python3 scripts/review_session.py register-run my-review candidate-result.json
+python3 scripts/compare_results.py baseline-result.json candidate-result.json
+python3 scripts/review_session.py decide my-review \
+  --candidate candidate-one \
+  --verdict accepted \
+  --reason "Improved the required behavior without a material regression."
+```
+
 Use per-source `include` and `exclude` glob patterns when files in the same canonical directory have different runtime roles.
 
 In a manifest-declared `runtime-skills` source, Markdown files with `name` and `description` Frontmatter are recognized as Skills even when their human-facing canonical filenames are flattened, such as `process.md`.
@@ -140,7 +164,7 @@ Read `protocol/safety.md` before importing private material or applying a propos
 
 ## Current limitations
 
-v0 provides isolated import, capability inventory, data validation, candidate management, result comparison, and patch generation. Behavioral model evaluation is performed through `SKILL.md` under the Evaluation Protocol. The repository does not assume a universal cross-model runtime and does not automatically modify live Skills.
+v0 provides atomic isolated import, capability inventory, Review Session state, Candidate sealing, Runner plans, auditable result registration, strict comparison, recorded decisions, and patch generation. It defines a provider-neutral Runner Contract but does not yet ship a universal cross-model execution adapter. It never automatically modifies live Skills.
 
 ## License
 

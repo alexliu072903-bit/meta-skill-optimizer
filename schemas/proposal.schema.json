@@ -2,8 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Optimization Proposal",
   "type": "object",
-  "required": ["id", "action", "target", "evidence", "expected_improvement", "complexity_change", "regression_risk", "reject_when"],
+  "required": ["version", "id", "action", "target", "evidence", "expected_improvement", "complexity_change", "regression_risk", "reject_when"],
   "properties": {
+    "version": {"const": 1},
     "id": {"type": "string"},
     "action": {"enum": ["add", "strengthen", "reroute", "merge", "split", "demote", "delete"]},
     "target": {"type": "array", "items": {"type": "string"}, "minItems": 1},
@@ -16,4 +17,3 @@
   },
   "additionalProperties": false
 }
-

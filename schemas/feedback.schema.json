@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Review Feedback",
+  "type": "object",
+  "required": ["version", "session_id", "decision", "reason", "case_ids"],
+  "properties": {
+    "version": {"const": 1},
+    "session_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "candidate": {"type": "string"},
+    "proposal": {"type": "string"},
+    "decision": {"enum": ["accepted", "rejected", "inconclusive", "corrected"]},
+    "reason": {"type": "string", "minLength": 1},
+    "case_ids": {"type": "array", "items": {"type": "string"}},
+    "follow_up": {"type": "string"}
+  },
+  "additionalProperties": false
+}
+

@@ -2,8 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Behavioral Case",
   "type": "object",
-  "required": ["id", "request", "must_behaviors", "must_not_behaviors", "rationale"],
+  "required": ["version", "id", "request", "must_behaviors", "must_not_behaviors", "rationale"],
   "properties": {
+    "version": {"const": 1},
     "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
     "request": {"type": "string", "minLength": 1},
     "context": {"type": "array", "items": {"type": "string"}, "default": []},
@@ -14,4 +15,3 @@
   },
   "additionalProperties": false
 }
-

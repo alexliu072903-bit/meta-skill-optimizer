@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import shutil
+import tempfile
 from pathlib import Path
 
 from common import WORKSPACE, require_empty_or_missing
@@ -37,7 +38,16 @@ def main() -> None:
         raise SystemExit("Destination must not be the source or a child of the source.")
     require_empty_or_missing(destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copytree(source, destination, ignore=ignored, dirs_exist_ok=False)
+    if destination.exists():
+        destination.rmdir()
+    temporary = Path(tempfile.mkdtemp(prefix=f".{destination.name}-import-", dir=destination.parent))
+    temporary.rmdir()
+    try:
+        shutil.copytree(source, temporary, ignore=ignored, dirs_exist_ok=False)
+        temporary.rename(destination)
+    except BaseException:
+        shutil.rmtree(temporary, ignore_errors=True)
+        raise
     print(f"Imported isolated baseline: {destination}")
 
 

@@ -2,8 +2,9 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "System Finding",
   "type": "object",
-  "required": ["id", "kind", "evidence_type", "evidence", "impact", "affected_capabilities"],
+  "required": ["version", "id", "kind", "evidence_type", "evidence", "impact", "affected_capabilities"],
   "properties": {
+    "version": {"const": 1},
     "id": {"type": "string"},
     "kind": {"enum": ["unreachable", "overlap", "shadowing", "conflict", "missing", "negative-contribution", "inconclusive"]},
     "evidence_type": {"enum": ["declared", "observed", "inferred"]},
@@ -14,4 +15,3 @@
   },
   "additionalProperties": false
 }
-

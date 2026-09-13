@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Review Session",
+  "type": "object",
+  "required": ["version", "id", "status", "manifest", "case_set", "baseline", "candidates", "runs"],
+  "properties": {
+    "version": {"const": 1},
+    "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+    "status": {"enum": ["imported", "candidate-ready", "evaluated", "accepted", "rejected", "inconclusive"]},
+    "manifest": {
+      "type": "object",
+      "required": ["path", "digest"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "case_set": {
+      "type": "object",
+      "required": ["path", "digest", "case_ids"],
+      "properties": {
+        "path": {"type": "string"},
+        "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+        "case_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+      },
+      "additionalProperties": false
+    },
+    "baseline": {
+      "type": "object",
+      "required": ["path", "digest"],
+      "properties": {
+        "path": {"type": "string"},
+        "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "path", "digest", "status"],
+        "properties": {
+          "name": {"type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$"},
+          "path": {"type": "string", "minLength": 1},
+          "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "status": {"enum": ["draft", "sealed"]}
+        },
+        "additionalProperties": false
+      }
+    },
+    "runs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["variant", "path", "digest"],
+        "properties": {
+          "variant": {"type": "string", "minLength": 1},
+          "path": {"type": "string", "minLength": 1},
+          "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "decision": {
+      "type": "object",
+      "required": ["path", "digest"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

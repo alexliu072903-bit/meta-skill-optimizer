@@ -92,6 +92,30 @@ python3 scripts/import_manifest.py subject.local.json
 python3 scripts/inventory.py workspace/baseline > workspace/inventory.json
 ```
 
+需要完成可审计的端到端评审时，使用有版本的 Review Session，不要手动维护散落的 Workspace 文件：
+
+```bash
+python3 scripts/review_session.py init my-review \
+  --manifest subject.local.json \
+  --cases benchmark/cases
+python3 scripts/review_session.py candidate my-review candidate-one
+# 只修改 workspace/sessions/my-review/candidates/candidate-one。
+python3 scripts/review_session.py seal-candidate my-review candidate-one
+python3 scripts/review_session.py plan my-review > workspace/run-plan.json
+```
+
+按照 `protocol/runner.md` 执行计划，注册有版本的结果、严格比较并记录决定：
+
+```bash
+python3 scripts/review_session.py register-run my-review baseline-result.json
+python3 scripts/review_session.py register-run my-review candidate-result.json
+python3 scripts/compare_results.py baseline-result.json candidate-result.json
+python3 scripts/review_session.py decide my-review \
+  --candidate candidate-one \
+  --verdict accepted \
+  --reason "核心行为改善且没有重要回归。"
+```
+
 如果同一个 canonical 目录中的文件承担不同运行角色，可以为每个来源配置 `include` 和 `exclude` glob。
 
 在 Manifest 声明的 `runtime-skills` 来源中，只要 Markdown 包含有效的 `name` 和 `description` Frontmatter，即使使用 `process.md` 这样的扁平化人类可读文件名，也会被正确识别为 Skill。
@@ -140,7 +164,7 @@ python3 scripts/generate_patch.py workspace/baseline workspace/candidates/routin
 
 ## 当前限制
 
-v0 提供隔离导入、能力盘点、数据校验、Candidate 管理、结果比较和 patch 生成。真实模型行为评测由 `SKILL.md` 按 Evaluation Protocol 执行；仓库暂不假设存在统一的跨模型 Runtime，也不提供自动修改正式 Skills 的能力。
+v0 提供原子隔离导入、能力盘点、Review Session 状态、Candidate sealing、Runner Plan、可审计结果注册、严格比较、决定记录和 patch 生成。仓库定义了与模型供应商无关的 Runner Contract，但暂不提供统一的跨模型执行 Adapter，也不会自动修改正式 Skills。
 
 ## License
 

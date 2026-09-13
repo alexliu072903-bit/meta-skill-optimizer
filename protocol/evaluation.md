@@ -2,6 +2,8 @@
 
 Evaluation asks first whether each component improves representative work, then whether the useful components improve or weaken one another. It is not another conversational phase and it does not score writing style in isolation.
 
+Use `scripts/review_session.py` for evaluations that produce Candidates or decisions. Read [runner.md](runner.md) for the execution boundary. Stored Result bundles must preserve raw outputs and evidence for every behavior check; summary counts alone are not auditable evidence.
+
 ## Evaluation order
 
 For a complete system review:
@@ -38,6 +40,8 @@ Use only the variants needed to answer the current question:
 - `isolated`: one capability used alone, only when diagnosing dilution or shadowing.
 
 Keep the user request, supplied context, model/runtime settings, and authorization constant across comparable runs. Record any unavoidable difference.
+
+Baseline and Candidate results must contain exactly the same Case IDs, Case digests, and behavior checks. Missing Cases are failures, not ignorable differences.
 
 ## Observation
 
