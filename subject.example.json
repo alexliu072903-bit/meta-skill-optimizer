@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "id": "my-agent-system",
+  "sources": [
+    {
+      "id": "meta-skills",
+      "kind": "runtime-skills",
+      "path": "/path/to/meta-skills",
+      "required": true,
+      "description": "Runtime Skill entrypoints and their directly bundled resources"
+    },
+    {
+      "id": "preferences",
+      "kind": "preference",
+      "path": "/path/to/prefer.md",
+      "required": true,
+      "description": "Always-on personal working preferences"
+    },
+    {
+      "id": "project-instructions",
+      "kind": "project-instructions",
+      "path": "/path/to/AGENTS.md",
+      "required": false,
+      "description": "Project-scoped instructions used in representative tasks"
+    },
+    {
+      "id": "context-provider",
+      "kind": "context-provider",
+      "path": "/path/to/context-skill",
+      "required": false,
+      "description": "Context capability that participates in the experienced runtime"
+    }
+  ]
+}
+

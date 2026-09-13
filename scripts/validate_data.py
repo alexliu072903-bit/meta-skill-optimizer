@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 
 from common import load_json
@@ -10,6 +11,8 @@ from common import load_json
 
 def validate(value, schema, location="$") -> list[str]:
     errors: list[str] = []
+    if "const" in schema and value != schema["const"]:
+        errors.append(f"{location}: value must equal {schema['const']!r}")
     expected = schema.get("type")
     type_map = {"object": dict, "array": list, "string": str, "integer": int, "boolean": bool}
     if expected in type_map and not isinstance(value, type_map[expected]):
@@ -36,8 +39,8 @@ def validate(value, schema, location="$") -> list[str]:
     if isinstance(value, str):
         if len(value) < schema.get("minLength", 0):
             errors.append(f"{location}: string is too short")
-        if "enum" in schema and value not in schema["enum"]:
-            errors.append(f"{location}: value is not in enum")
+        if "pattern" in schema and re.fullmatch(schema["pattern"], value) is None:
+            errors.append(f"{location}: value does not match required pattern")
     if isinstance(value, int) and not isinstance(value, bool):
         if value < schema.get("minimum", value):
             errors.append(f"{location}: value is below minimum")
@@ -74,4 +77,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -12,6 +12,26 @@ python3 "$ROOT/scripts/new_candidate.py" synthetic-change
 printf '\nCandidate-only line.\n' >> "$MSO_WORKSPACE/candidates/synthetic-change/alpha/SKILL.md"
 python3 "$ROOT/scripts/generate_patch.py" "$MSO_WORKSPACE/baseline" "$MSO_WORKSPACE/candidates/synthetic-change" > "$TMP_DIR/candidate.patch"
 test -s "$TMP_DIR/candidate.patch"
+python3 - "$ROOT" "$TMP_DIR" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+root, temp = map(Path, sys.argv[1:])
+manifest = {
+    "version": 1,
+    "id": "synthetic-system",
+    "sources": [
+        {"id": "skills", "kind": "runtime-skills", "path": str(root / "tests/fixtures/subject")},
+        {"id": "prefer", "kind": "preference", "path": str(root / "tests/fixtures/prefer.md")},
+        {"id": "optional-context", "kind": "context-provider", "path": str(temp / "missing"), "required": False}
+    ]
+}
+(temp / "subject.json").write_text(json.dumps(manifest))
+PY
+python3 "$ROOT/scripts/validate_data.py" "$TMP_DIR/subject.json" "$ROOT/schemas/subject.schema.json"
+python3 "$ROOT/scripts/import_manifest.py" "$TMP_DIR/subject.json" --destination "$TMP_DIR/composite"
+python3 "$ROOT/scripts/inventory.py" "$TMP_DIR/composite" > "$TMP_DIR/composite-inventory.json"
 python3 "$ROOT/scripts/validate_data.py" "$ROOT/benchmark/cases" "$ROOT/schemas/case.schema.json"
 python3 - "$TMP_DIR" <<'PY'
 import json
@@ -22,6 +42,12 @@ root = Path(sys.argv[1])
 inventory = json.loads((root / "inventory.json").read_text())
 assert inventory["skill_count"] == 2
 assert inventory["skills"][0]["name"] == "alpha"
+
+composite = json.loads((root / "composite-inventory.json").read_text())
+assert composite["source_count"] == 3
+assert composite["skill_count"] == 2
+assert composite["instruction_document_count"] == 1
+assert composite["instruction_documents"][0]["source_kind"] == "preference"
 
 baseline = {
     "variant": "baseline",

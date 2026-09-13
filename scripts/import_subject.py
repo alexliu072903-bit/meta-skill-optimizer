@@ -14,8 +14,13 @@ IGNORED_NAMES = {
 }
 
 
-def ignored(_directory: str, names: list[str]) -> set[str]:
-    return {name for name in names if name in IGNORED_NAMES or name.endswith(".pyc")}
+def ignored(directory: str, names: list[str]) -> set[str]:
+    return {
+        name for name in names
+        if name in IGNORED_NAMES
+        or name.endswith(".pyc")
+        or (Path(directory) / name).is_symlink()
+    }
 
 
 def main() -> None:
@@ -38,4 +43,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 from pathlib import Path
 
@@ -37,21 +38,64 @@ def main() -> None:
     if not subject.is_dir():
         raise SystemExit(f"Subject is not a directory: {subject}")
 
+    lock_path = subject / "subject.lock.json"
+    source_index = {}
+    source_records = []
+    if lock_path.is_file():
+        lock = json.loads(lock_path.read_text(encoding="utf-8"))
+        source_records = [{
+            "id": item["id"], "kind": item["kind"],
+            "present": item["present"], "file_count": item["file_count"]
+        } for item in lock.get("sources", [])]
+        source_index = {item["id"]: item["kind"] for item in lock.get("sources", [])}
+
+    def source_for(path: Path) -> tuple[str, str]:
+        relative = path.relative_to(subject)
+        parts = relative.parts
+        if len(parts) >= 3 and parts[0] == "sources" and parts[1] in source_index:
+            return parts[1], source_index[parts[1]]
+        return "subject", "runtime-skills"
+
     skills = []
     for path in sorted(subject.rglob("SKILL*.md")):
         text = path.read_text(encoding="utf-8", errors="replace")
         metadata = frontmatter(text)
+        source_id, source_kind = source_for(path)
         skills.append({
             "path": str(path.relative_to(subject)),
+            "source_id": source_id,
+            "source_kind": source_kind,
             "name": metadata.get("name", path.stem.lower()),
             "description": metadata.get("description", ""),
             "declared_references": sorted(set(REFERENCE.findall(text))),
             "bytes": path.stat().st_size,
             "lines": text.count("\n") + 1,
         })
-    write_json({"subject": str(subject), "skill_count": len(skills), "skills": skills})
+    skill_paths = {item["path"] for item in skills}
+    documents = []
+    for path in sorted(subject.rglob("*.md")):
+        relative = str(path.relative_to(subject))
+        if relative in skill_paths:
+            continue
+        source_id, source_kind = source_for(path)
+        text = path.read_text(encoding="utf-8", errors="replace")
+        documents.append({
+            "path": relative,
+            "source_id": source_id,
+            "source_kind": source_kind,
+            "bytes": path.stat().st_size,
+            "lines": text.count("\n") + 1,
+        })
+    write_json({
+        "subject": str(subject),
+        "source_count": len(source_records) if source_records else 1,
+        "sources": source_records,
+        "skill_count": len(skills),
+        "skills": skills,
+        "instruction_document_count": len(documents),
+        "instruction_documents": documents
+    })
 
 
 if __name__ == "__main__":
     main()
-

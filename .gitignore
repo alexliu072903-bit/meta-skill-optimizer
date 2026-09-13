@@ -1,6 +1,6 @@
 workspace/
 benchmark/results/
+subject.local.json
 *.pyc
 __pycache__/
 .DS_Store
-

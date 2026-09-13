@@ -2,6 +2,8 @@
 
 Use this model to describe what a Skill contributes to the system. Do not confuse a file, a Skill, and a capability: one Skill may contain several capabilities, and the same capability may be duplicated across Skills.
 
+Before modeling capabilities, read [subject-manifest.md](subject-manifest.md) when the runtime combines Skills with preferences, project instructions, or context providers.
+
 ## Required fields
 
 Each capability record contains:
@@ -45,4 +47,3 @@ Report a structural risk when one of these is true:
 - accumulated constraints remove the autonomy required to complete the task.
 
 Structural risks are hypotheses until a behavioral case demonstrates impact.
-

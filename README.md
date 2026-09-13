@@ -40,6 +40,7 @@ meta-skill-optimizer/
 ├── agents/openai.yaml
 ├── protocol/
 ├── schemas/
+├── subject.example.json
 ├── scripts/
 ├── benchmark/
 │   ├── cases/
@@ -51,7 +52,17 @@ meta-skill-optimizer/
 
 ## First use
 
-Import only a copy of the system under evaluation:
+When the experienced runtime combines Skills, preferences, project instructions, or context providers, copy `subject.example.json`, declare every relevant source, and import the composite subject:
+
+```bash
+cp subject.example.json subject.local.json
+# Edit subject.local.json with local source paths.
+python3 scripts/validate_data.py subject.local.json schemas/subject.schema.json
+python3 scripts/import_manifest.py subject.local.json
+python3 scripts/inventory.py workspace/baseline > workspace/inventory.json
+```
+
+For a single-directory subject, use the simpler importer:
 
 ```bash
 python3 scripts/import_subject.py /path/to/source
@@ -91,6 +102,7 @@ Read `protocol/safety.md` before importing private material or applying a propos
 - Every experiment occurs in a separate candidate.
 - `workspace/` and `benchmark/results/` are excluded from Git.
 - The optimizer generates patches and never writes them back without explicit user authorization.
+- Symbolic links are excluded, and a composite import records source kinds and file hashes in the ignored `subject.lock.json`.
 
 ## Current limitations
 
@@ -99,4 +111,3 @@ v0 provides isolated import, capability inventory, data validation, candidate ma
 ## License
 
 MIT
-

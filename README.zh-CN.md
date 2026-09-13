@@ -40,6 +40,7 @@ meta-skill-optimizer/
 ├── agents/openai.yaml
 ├── protocol/
 ├── schemas/
+├── subject.example.json
 ├── scripts/
 ├── benchmark/
 │   ├── cases/
@@ -51,7 +52,17 @@ meta-skill-optimizer/
 
 ## 首次使用
 
-只将待评估系统的副本导入隔离区：
+当真实运行环境由 Skills、Preference、Project Instructions 或 Context Provider 共同组成时，复制 `subject.example.json`、声明所有相关来源，然后导入组合后的测试对象：
+
+```bash
+cp subject.example.json subject.local.json
+# 在 subject.local.json 中填写本地来源路径。
+python3 scripts/validate_data.py subject.local.json schemas/subject.schema.json
+python3 scripts/import_manifest.py subject.local.json
+python3 scripts/inventory.py workspace/baseline > workspace/inventory.json
+```
+
+如果测试对象只有一个目录，可以使用简化导入方式：
 
 ```bash
 python3 scripts/import_subject.py /path/to/source
@@ -91,6 +102,7 @@ python3 scripts/generate_patch.py workspace/baseline workspace/candidates/routin
 - 所有实验发生在独立 Candidate 中；
 - `workspace/` 和 `benchmark/results/` 默认不进入 Git；
 - 系统只生成 patch，未经用户明确授权不回写正式版本。
+- 导入时会排除符号链接，并在 Git 忽略的 `subject.lock.json` 中记录来源类型和文件哈希。
 
 ## 当前限制
 
@@ -99,4 +111,3 @@ v0 提供隔离导入、能力盘点、数据校验、Candidate 管理、结果�
 ## License
 
 MIT
-

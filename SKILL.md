@@ -10,9 +10,10 @@ Optimize the behavior of the complete Skill system, not the apparent quality or 
 ## Start safely
 
 1. Read [protocol/safety.md](protocol/safety.md).
-2. Work only on an isolated copy under `workspace/` unless the user explicitly authorizes another test location.
-3. Preserve an immutable baseline. Put each proposed change in a separate candidate.
-4. Never apply a candidate to the source automatically. Produce a patch for review.
+2. When behavior depends on multiple instruction sources, read [protocol/subject-manifest.md](protocol/subject-manifest.md) and import a composite subject.
+3. Work only on an isolated copy under `workspace/` unless the user explicitly authorizes another test location.
+4. Preserve an immutable baseline. Put each proposed change in a separate candidate.
+5. Never apply a candidate to the source automatically. Produce a patch for review.
 
 ## Choose the needed operation
 
@@ -54,4 +55,3 @@ Return only findings that can change the system. For each proposal include:
 - regression risk;
 - the patch or exact files to change;
 - the evidence that would reject the proposal.
-
